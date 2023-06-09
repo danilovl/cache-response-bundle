@@ -9,6 +9,14 @@
 
 Symfony bundle provides simple cache response.
 
+Before:
+
+![Alt text](/.github/readme/profiler_before.png?raw=true "Profiler before")
+
+After:
+
+![Alt text](/.github/readme/profiler_after.png?raw=true "Profiler after")
+
 ### Requirements
 
 * PHP 8.2.0 or higher
@@ -36,7 +44,7 @@ return [
 
 ### 2. Usage
 
-You can define custom cache service.
+You can define custom cache service witch implement `CacheItemPoolInterface`.
 
 ```yaml
 # config/packages/danilovl_cache_response.yaml
