@@ -1,0 +1,8 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  Danilovl\CacheResponseBundle\EventListener\KernelControllerListener:
+  Danilovl\CacheResponseBundle\EventListener\KernelResponseListener:

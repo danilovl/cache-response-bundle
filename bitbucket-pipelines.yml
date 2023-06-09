@@ -1,0 +1,11 @@
+image: php:8.2-alpine
+
+pipelines:
+  default:
+    - step:
+        name: phpunit
+        script:
+          - apk update && apk add gmp-dev && docker-php-ext-install gmp
+          - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+          - composer install
+          - vendor/bin/phpunit tests
