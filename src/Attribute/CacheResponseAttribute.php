@@ -33,7 +33,7 @@ class CacheResponseAttribute
             }
         }
 
-        if ($this->cacheKeyWithQuery) {
+        if ($this->cacheKeyWithRequest) {
             $requestAll = $request->request->all();
             if (count($requestAll) > 0) {
                 $cacheKey .= '.' . sha1(serialize($requestAll));
