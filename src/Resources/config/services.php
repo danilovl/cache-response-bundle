@@ -2,21 +2,18 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Danilovl\CacheResponseBundle\EventListener\{
-    KernelResponseListener,
-    KernelControllerListener
-};
-
 return static function (ContainerConfigurator $container): void {
     $container->services()
-        ->set(KernelControllerListener::class, KernelControllerListener::class)
+        ->defaults()
         ->autowire()
         ->autoconfigure()
         ->public();
 
     $container->services()
-        ->set(KernelResponseListener::class, KernelResponseListener::class)
-        ->autowire()
-        ->autoconfigure()
-        ->public();
+        ->load('Danilovl\\CacheResponseBundle\\', '../../../src')
+        ->exclude([
+            '../../../src/Attribute',
+            '../../../src/DependencyInjection',
+            '../../../src/Resources'
+        ]);
 };

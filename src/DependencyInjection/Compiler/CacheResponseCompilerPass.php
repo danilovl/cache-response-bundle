@@ -2,7 +2,9 @@
 
 namespace Danilovl\CacheResponseBundle\DependencyInjection\Compiler;
 
+use Danilovl\CacheResponseBundle\Command\CacheResponseClearCommand;
 use Danilovl\CacheResponseBundle\DependencyInjection\Configuration;
+use Danilovl\CacheResponseBundle\Service\CacheService;
 use InvalidArgumentException;
 use Danilovl\CacheResponseBundle\EventListener\{
     KernelResponseListener,
@@ -46,11 +48,17 @@ class CacheResponseCompilerPass implements CompilerPassInterface
             throw new InvalidArgumentException($message);
         }
 
-        $kernelControllerListener = $container->getDefinition(KernelControllerListener::class);
-        $kernelControllerListener->setArgument(0, $cacheServiceContainer);
+        $definitions = [
+            CacheService::class,
+            CacheResponseClearCommand::class,
+            KernelControllerListener::class,
+            KernelResponseListener::class
+        ];
 
-        $kernelResponseListener = $container->getDefinition(KernelResponseListener::class);
-        $kernelResponseListener->setArgument(0, $cacheServiceContainer);
+        foreach ($definitions as $definition) {
+            $definition = $container->getDefinition($definition);
+            $definition->setArgument(0, $cacheServiceContainer);
+        }
     }
 
     private function processConfiguration(ConfigurationInterface $configuration, array $configs): array

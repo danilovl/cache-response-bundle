@@ -65,6 +65,26 @@ public function index(Request $request): Response
 }
 ```
 
+#### 2.2 Command
+
+Show all used `CacheResponseAttribute` cache key names.
+
+```php
+bin/console danilovl:cache-response:list 
+```
+
+Clear all `CacheResponseAttribute` cache.
+
+```php
+bin/console danilovl:cache-response:clear --all=true
+```
+
+Clear only specific `CacheResponseAttribute` cache key name.
+
+```php
+bin/console danilovl:cache-response:clear --cacheKey=index
+```
+
 ## License
 
 The CacheResponseBundle is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

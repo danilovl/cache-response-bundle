@@ -3,6 +3,7 @@
 namespace Danilovl\CacheResponseBundle\EventListener;
 
 use Danilovl\CacheResponseBundle\Attribute\CacheResponseAttribute;
+use Danilovl\CacheResponseBundle\Service\CacheService;
 use Psr\Cache\CacheItemPoolInterface;
 use ReflectionClass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -76,6 +77,18 @@ readonly class KernelResponseListener implements EventSubscriberInterface
         }
 
         $this->cacheItemPool->save($cache);
+
+        $attributeCacheKeys = $this->cacheItemPool->getItem(CacheService::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
+        $keys = [];
+
+        if ($attributeCacheKeys->isHit()) {
+            $keys = $attributeCacheKeys->get();
+        }
+
+        $keys[] = $cacheKey;
+        $attributeCacheKeys->set($keys);
+
+        $this->cacheItemPool->save($attributeCacheKeys);
     }
 
     public static function getSubscribedEvents(): array
