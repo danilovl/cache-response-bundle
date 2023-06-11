@@ -26,8 +26,10 @@ class CacheResponseListCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $tableRows = [];
         $routes = $this->router->getRouteCollection()->all();
+
+        $table = (new Table($output))
+            ->setHeaders(['Controller', 'Action', 'Сache info', 'Expires after', 'Expires at', 'With query', 'Wth request']);
 
         foreach ($routes as $route) {
             $controller = $route->getDefault('_controller');
@@ -54,25 +56,27 @@ class CacheResponseListCommand extends Command
             $attribute = $attributes->newInstance();
             $actuallyInCache = $this->cacheService->findSimilarCacheKeys($attribute->cacheKey);
 
-            $tableRows[] = [
-                'controller' => $controller,
-                'method' => $method,
-                'originalCacheKey' => $attribute->originalCacheKey,
-                'cacheKey' => $attribute->cacheKey,
-                'actuallyInCache' => implode(PHP_EOL, $actuallyInCache),
-                'expiresAfter' => $this->getFormattedExpiration($attribute->expiresAfter),
-                'expiresAt' => $this->getFormattedExpiration($attribute->expiresAt),
-                'cacheKeyWithQuery' => $attribute->cacheKeyWithQuery !== null ? 'yes' : 'no',
-                'cacheKeyWithRequest' => $attribute->cacheKeyWithRequest !== null ? 'yes' : 'no'
-            ];
+            $table->addRow([
+                $controller,
+                $method,
+                'Original cache key:',
+                $this->getFormattedExpiration($attribute->expiresAfter),
+                $this->getFormattedExpiration($attribute->expiresAt),
+                $attribute->cacheKeyWithQuery ? 'yes' : 'no',
+                $attribute->cacheKeyWithRequest ? 'yes' : 'no'
+            ]);
 
-            $output->writeln($route->getDefault('_controller'));
+            $table->addRow([null, null, $attribute->originalCacheKey, null, null, null, null]);
+            $table->addRow([null, null, null, null, null, null, null]);
+            $table->addRow([null, null, 'Attribute cache key:', null, null, null, null]);
+            $table->addRow([null, null, $attribute->cacheKey, null, null, null, null]);
+            $table->addRow([null, null, null, null, null, null, null]);
+            $table->addRow([null, null, 'Actually in cache:', null, null, null, null]);
+            $table->addRow([null, null, implode(PHP_EOL, $actuallyInCache), null, null, null, null]);
+            $table->addRow([null, null, null, null, null, null, null]);
         }
 
-        (new Table($output))
-            ->setHeaders(['Controller', 'Action', 'Original cache key', 'Cache key', 'Actually in cache', 'Expires after', 'Expires at', 'Cache key', 'Cache key'])
-            ->setRows($tableRows)
-            ->render();
+        $table->render();
 
         return Command::SUCCESS;
     }

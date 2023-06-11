@@ -65,6 +65,16 @@ public function index(Request $request): Response
 }
 ```
 
+Or better solution if you have duplicate controller name and method name.
+
+```php
+#[CacheResponseAttribute(cacheKey: __METHOD__, expiresAfter: 60, cacheKeyWithQuery: true, cacheKeyWithRequest: true)]
+public function index(Request $request): Response
+{
+    return new Response('content');
+}
+```
+
 #### 2.2 Command
 
 Show all used `CacheResponseAttribute` cache key names.

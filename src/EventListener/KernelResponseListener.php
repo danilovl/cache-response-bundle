@@ -85,9 +85,11 @@ readonly class KernelResponseListener implements EventSubscriberInterface
             $keys = $attributeCacheKeys->get();
         }
 
-        $keys[] = $cacheKey;
-        $attributeCacheKeys->set($keys);
+        if (!in_array($cacheKey, $keys)) {
+            $keys[] = $cacheKey;
+        }
 
+        $attributeCacheKeys->set($keys);
         $this->cacheItemPool->save($attributeCacheKeys);
     }
 
