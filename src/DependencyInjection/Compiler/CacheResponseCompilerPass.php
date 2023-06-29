@@ -4,6 +4,7 @@ namespace Danilovl\CacheResponseBundle\DependencyInjection\Compiler;
 
 use Danilovl\CacheResponseBundle\Command\CacheResponseClearCommand;
 use Danilovl\CacheResponseBundle\DependencyInjection\Configuration;
+use Danilovl\CacheResponseBundle\EventSubscriber\CacheResponseSubscriber;
 use Danilovl\CacheResponseBundle\Service\CacheService;
 use InvalidArgumentException;
 use Danilovl\CacheResponseBundle\EventListener\{
@@ -52,7 +53,8 @@ class CacheResponseCompilerPass implements CompilerPassInterface
             CacheService::class,
             CacheResponseClearCommand::class,
             KernelControllerListener::class,
-            KernelResponseListener::class
+            KernelResponseListener::class,
+            CacheResponseSubscriber::class
         ];
 
         foreach ($definitions as $definition) {

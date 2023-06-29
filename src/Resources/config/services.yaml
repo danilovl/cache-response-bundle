@@ -9,4 +9,5 @@ services:
     exclude:
       - '../../../src/Attribute'
       - '../../../src/DependencyInjection'
+      - '../../../src/EventSubscriber/Event'
       - '../../../src/Resources'

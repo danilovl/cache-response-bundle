@@ -6,7 +6,7 @@ use Psr\Cache\CacheItemPoolInterface;
 
 class CacheService
 {
-    public const CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS = 'danilovl.cache_response:attribute_cache_keys';
+    public const CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS = 'danilovl.cache_response.attribute_cache_keys';
 
     public function __construct(private readonly CacheItemPoolInterface $cacheItemPool) {}
 

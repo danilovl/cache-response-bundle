@@ -14,6 +14,7 @@ return static function (ContainerConfigurator $container): void {
         ->exclude([
             '../../../src/Attribute',
             '../../../src/DependencyInjection',
+            '../../../src/EventSubscriber/Event',
             '../../../src/Resources'
         ]);
 };

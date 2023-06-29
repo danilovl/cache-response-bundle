@@ -95,6 +95,20 @@ Clear only specific `CacheResponseAttribute` cache key name.
 bin/console danilovl:cache-response:clear --cacheKey=index
 ```
 
+#### 2.3 EventSubscriber
+
+Clear all cache.
+
+```php
+$this->eventDispatcher->dispatch(new ClearCacheResponseAllEvent);
+```
+
+Clear only specific cache key.
+
+```php
+$this->eventDispatcher->dispatch(new ClearCacheResponseKeyEvent('cache_key'));
+```
+
 ## License
 
 The CacheResponseBundle is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
