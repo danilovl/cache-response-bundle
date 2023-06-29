@@ -43,19 +43,23 @@ class CacheResponseSubscriberTest extends TestCase
 
     public function testClearCacheResponseKeyEvent(): void
     {
+        $cacheItem = $this->cacheItemPool->getItem(self::CLEAR_CACHE_RESPONSE_KEY);
+        $this->assertTrue($cacheItem->isHit());
+
         $this->eventDispatcher->dispatch(new ClearCacheResponseKeyEvent(self::CLEAR_CACHE_RESPONSE_KEY));
 
         $cacheItem = $this->cacheItemPool->getItem(self::CLEAR_CACHE_RESPONSE_KEY);
-
         $this->assertFalse($cacheItem->isHit());
     }
 
     public function testClearCacheResponseAllEvent(): void
     {
+        $cacheItem = $this->cacheItemPool->getItem(CacheService::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
+        $this->assertTrue($cacheItem->isHit());
+
         $this->eventDispatcher->dispatch(new ClearCacheResponseAllEvent);
 
         $cacheItem = $this->cacheItemPool->getItem(CacheService::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
-
         $this->assertFalse($cacheItem->isHit());
     }
 }
