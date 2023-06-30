@@ -5,10 +5,7 @@ namespace Danilovl\CacheResponseBundle\Tests\EventListener;
 use Danilovl\CacheResponseBundle\EventListener\KernelResponseListener;
 use Danilovl\CacheResponseBundle\Tests\TestController;
 use PHPUnit\Framework\TestCase;
-use Psr\Cache\{
-    CacheItemInterface,
-    CacheItemPoolInterface
-};
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\{
     Event\ResponseEvent,
@@ -23,20 +20,18 @@ class KernelResponseListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->createMock(KernelInterface::class),
             new Request(
-                attributes: ['_controller' => 'Danilovl\CacheResponseBundle\Tests\TestController::index'],
+                attributes: ['_controller' => TestController::class . '::index'],
             ),
             HttpKernelInterface::MAIN_REQUEST,
             (new TestController())->index()
         );
 
-        $cacheItemInterface = $this->createMock(CacheItemInterface::class);
-        $cacheItemInterface->method('isHit')->willReturn(true);
-        $cacheItemInterface->method('get')->willReturn((new TestController())->index());
+        $cacheItemPool = new ArrayAdapter;
+        $cacheItemKey = $cacheItemPool->getItem('index');
+        $cacheItemKey->set((new TestController())->index());
+        $cacheItemPool->save($cacheItemKey);
 
-        $cacheItemPoolInterface = $this->createMock(CacheItemPoolInterface::class);
-        $cacheItemPoolInterface->method('getItem')->willReturn($cacheItemInterface);
-
-        $subscriber = new KernelResponseListener($cacheItemPoolInterface);
+        $subscriber = new KernelResponseListener($cacheItemPool);
         $subscriber->onKernelResponse($event);
 
         $this->assertTrue(true);

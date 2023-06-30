@@ -5,14 +5,11 @@ namespace Danilovl\CacheResponseBundle\Tests\EventListener;
 use Danilovl\CacheResponseBundle\EventListener\KernelControllerListener;
 use Danilovl\CacheResponseBundle\Tests\TestController;
 use PHPUnit\Framework\TestCase;
-use Psr\Cache\{
-    CacheItemInterface,
-    CacheItemPoolInterface
-};
 use Symfony\Component\HttpFoundation\{
     Request,
     Response
 };
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\{
     KernelInterface,
@@ -30,14 +27,12 @@ class KernelControllerListenerTest extends TestCase
             HttpKernelInterface::MAIN_REQUEST
         );
 
-        $cacheItemInterface = $this->createMock(CacheItemInterface::class);
-        $cacheItemInterface->method('isHit')->willReturn(true);
-        $cacheItemInterface->method('get')->willReturn(new Response('content'));
+        $cacheItemPool = new ArrayAdapter;
+        $cacheItemKey = $cacheItemPool->getItem('index');
+        $cacheItemKey->set(new Response('content'));
+        $cacheItemPool->save($cacheItemKey);
 
-        $cacheItemPoolInterface = $this->createMock(CacheItemPoolInterface::class);
-        $cacheItemPoolInterface->method('getItem')->willReturn($cacheItemInterface);
-
-        $subscriber = new KernelControllerListener($cacheItemPoolInterface);
+        $subscriber = new KernelControllerListener($cacheItemPool);
         $subscriber->onKernelController($event);
 
         /** @var Response $response */
@@ -57,12 +52,7 @@ class KernelControllerListenerTest extends TestCase
             HttpKernelInterface::MAIN_REQUEST
         );
 
-        $cacheItemInterface = $this->createMock(CacheItemInterface::class);
-        $cacheItemInterface->method('isHit')->willReturn(false);
-
-        $cacheItemPoolInterface = $this->createMock(CacheItemPoolInterface::class);
-
-        $subscriber = new KernelControllerListener($cacheItemPoolInterface);
+        $subscriber = new KernelControllerListener((new ArrayAdapter));
         $subscriber->onKernelController($event);
 
         $this->assertEquals($eventController, $event->getController());
