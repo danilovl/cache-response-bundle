@@ -39,17 +39,23 @@ class CacheResponseAttributeTest extends TestCase
     {
         $cacheResponseAttribute = new CacheResponseAttribute('test.key');
 
-        $this->assertEquals('danilovl.cache_response.test.key', $cacheResponseAttribute->getCacheKey(new Request));
+        $this->assertEquals(
+            CacheResponseAttribute::CACHE_KEY_PREFIX . 'test.key',
+            $cacheResponseAttribute->getCacheKey(new Request)
+        );
     }
 
     public function testGetCacheKeyWithPrefix(): void
     {
-        $this->assertEquals('danilovl.cache_response.test.key', CacheResponseAttribute::getCacheKeyWithPrefix('test.key'));
+        $this->assertEquals(
+            CacheResponseAttribute::CACHE_KEY_PREFIX . 'test.key',
+            CacheResponseAttribute::getCacheKeyWithPrefix('test.key')
+        );
     }
 
     public function testIsCacheKeyContainsPrefixSucceed(): void
     {
-        $this->assertTrue(CacheResponseAttribute::isCacheKeyContainsPrefix('danilovl.cache_response.test.key'));
+        $this->assertTrue(CacheResponseAttribute::isCacheKeyContainsPrefix(CacheResponseAttribute::CACHE_KEY_PREFIX . 'test.key'));
     }
 
     public function testIsCacheKeyContainsPrefixFailed(): void
