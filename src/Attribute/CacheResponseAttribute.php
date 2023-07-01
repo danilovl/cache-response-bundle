@@ -3,6 +3,8 @@
 namespace Danilovl\CacheResponseBundle\Attribute;
 
 use Attribute;
+use Danilovl\CacheResponseBundle\Exception\CacheResponseInvalidArgumentException;
+use Danilovl\CacheResponseBundle\Interfaces\CacheKeyFactoryInterface;
 use DateInterval;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -12,18 +14,35 @@ class CacheResponseAttribute
     public const CACHE_KEY_PREFIX = 'danilovl.cache_response.';
     public const REQUEST_ATTRIBUTES_CACHE_USED = 'danilovl.cache_response_used';
 
-    public readonly string $originalCacheKey;
-    public readonly string $cacheKey;
+    public readonly ?string $originalCacheKey;
+    public readonly ?string $cacheKey;
 
     public function __construct(
-        string $cacheKey,
+        ?string $cacheKey = null,
+        public readonly ?string $cacheKeyFactory = null,
         public readonly int|DateInterval|null $expiresAfter = null,
         public readonly int|DateInterval|null $expiresAt = null,
         public readonly bool $cacheKeyWithQuery = false,
         public readonly bool $cacheKeyWithRequest = false
     ) {
-        $this->originalCacheKey = $cacheKey;
-        $this->cacheKey = self::CACHE_KEY_PREFIX . $cacheKey;
+        if ($cacheKey === null && $cacheKeyFactory === null) {
+            throw new CacheResponseInvalidArgumentException('CacheKey or CacheKeyFactory is required.');
+        }
+
+        if ($cacheKey !== null) {
+            $this->originalCacheKey = $cacheKey;
+            $this->cacheKey = self::CACHE_KEY_PREFIX . $cacheKey;
+        } else {
+            $this->originalCacheKey = null;
+            $this->cacheKey = null;
+        }
+
+        if ($cacheKeyFactory !== null) {
+            $interfaces = class_implements($cacheKeyFactory);
+            if ($interfaces !== false && !in_array(CacheKeyFactoryInterface::class, $interfaces)) {
+                throw new CacheResponseInvalidArgumentException('Class CacheKeyFactory is not implemented CacheKeyFactoryInterface.');
+            }
+        }
     }
 
     public function getCacheKey(Request $request): string

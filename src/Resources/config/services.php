@@ -7,6 +7,7 @@ return static function (ContainerConfigurator $container): void {
         ->defaults()
         ->autowire()
         ->autoconfigure()
+        ->bind('$container', service('service_container'))
         ->public();
 
     $container->services()

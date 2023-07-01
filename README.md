@@ -58,7 +58,12 @@ danilovl_cache_response:
 Add attribute `CacheResponseAttribute` to controller method.
 
 ```php
-#[CacheResponseAttribute(cacheKey: 'index', expiresAfter: 60, cacheKeyWithQuery: true, cacheKeyWithRequest: true)]
+#[CacheResponseAttribute(
+    cacheKey: 'index', 
+    expiresAfter: 60, 
+    cacheKeyWithQuery: true, 
+    cacheKeyWithRequest: true
+)]
 public function index(Request $request): Response
 {
     return new Response('content');
@@ -68,7 +73,22 @@ public function index(Request $request): Response
 Or better solution if you have duplicate controller name and method name.
 
 ```php
-#[CacheResponseAttribute(cacheKey: __METHOD__, expiresAfter: 60, cacheKeyWithQuery: true, cacheKeyWithRequest: true)]
+#[CacheResponseAttribute(
+    cacheKey: __METHOD__, 
+    expiresAfter: 60, 
+    cacheKeyWithQuery: true, 
+    cacheKeyWithRequest: true
+)]
+public function index(Request $request): Response
+{
+    return new Response('content');
+}
+```
+
+Use custom factory service for create cache key. Must implements interface `CacheKeyFactoryInterface`.
+
+```php
+#[CacheResponseAttribute(cacheKeyFactory: CachKeyFactoryClass::class)]
 public function index(Request $request): Response
 {
     return new Response('content');

@@ -12,4 +12,10 @@ class TestController
     {
         return new Response('content');
     }
+
+    #[CacheResponseAttribute(cacheKeyFactory: TestCacheKeyFactory::class)]
+    public function cacheKeyFactory(): Response
+    {
+        return new Response('CacheKeyFactory content');
+    }
 }

@@ -12,6 +12,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 #[AsCommand(name: 'danilovl:cache-response:list', description: 'List of cache response attributes.')]
@@ -19,7 +20,8 @@ class CacheResponseListCommand extends Command
 {
     public function __construct(
         private readonly CacheService $cacheService,
-        private readonly RouterInterface $router
+        private readonly RouterInterface $router,
+        private readonly ContainerInterface $container
     ) {
         parent::__construct();
     }
@@ -29,7 +31,7 @@ class CacheResponseListCommand extends Command
         $routes = $this->router->getRouteCollection()->all();
 
         $table = (new Table($output))
-            ->setHeaders(['Controller', 'Action', 'Сache info', 'Expires after', 'Expires at', 'With query', 'Wth request']);
+            ->setHeaders(['Controller', 'Action', 'Cache info', 'Cache key factory', 'Expires after', 'Expires at', 'With query', 'Wth request']);
 
         foreach ($routes as $route) {
             $controller = $route->getDefault('_controller');
@@ -54,26 +56,35 @@ class CacheResponseListCommand extends Command
 
             /** @var CacheResponseAttribute $attribute */
             $attribute = $attributes->newInstance();
-            $actuallyInCache = $this->cacheService->findSimilarCacheKeys($attribute->cacheKey);
+
+            $cacheFactory = null;
+            if ($attribute->cacheKeyFactory !== null) {
+                $cacheFactory = $this->container->get($attribute->cacheKeyFactory);
+            }
+
+            $cacheKey = $cacheFactory?->getCacheKey() ?? $attribute->cacheKey;
+            $actuallyInCache = $this->cacheService->findSimilarCacheKeys($cacheKey);
+            $originalCacheKey = $attribute->originalCacheKey ?? $cacheFactory?->getCacheKey();
 
             $table->addRow([
                 $controller,
                 $method,
                 'Original cache key:',
+                $cacheFactory !== null ? 'yes' : 'no',
                 $this->getFormattedExpiration($attribute->expiresAfter),
                 $this->getFormattedExpiration($attribute->expiresAt),
                 $attribute->cacheKeyWithQuery ? 'yes' : 'no',
                 $attribute->cacheKeyWithRequest ? 'yes' : 'no'
             ]);
 
-            $table->addRow([null, null, $attribute->originalCacheKey, null, null, null, null]);
-            $table->addRow([null, null, null, null, null, null, null]);
-            $table->addRow([null, null, 'Attribute cache key:', null, null, null, null]);
-            $table->addRow([null, null, $attribute->cacheKey, null, null, null, null]);
-            $table->addRow([null, null, null, null, null, null, null]);
-            $table->addRow([null, null, 'Actually in cache:', null, null, null, null]);
-            $table->addRow([null, null, implode(PHP_EOL, $actuallyInCache), null, null, null, null]);
-            $table->addRow([null, null, null, null, null, null, null]);
+            $table->addRow([null, null, $originalCacheKey, null, null, null, null, null]);
+            $table->addRow([null, null, null, null, null, null, null, null]);
+            $table->addRow([null, null, 'Attribute cache key:', null, null, null, null, null]);
+            $table->addRow([null, null, $cacheKey, null, null, null, null, null]);
+            $table->addRow([null, null, null, null, null, null, null, null]);
+            $table->addRow([null, null, 'Actually in cache:', null, null, null, null, null]);
+            $table->addRow([null, null, implode(PHP_EOL, $actuallyInCache), null, null, null, null, null]);
+            $table->addRow([null, null, null, null, null, null, null, null]);
         }
 
         $table->render();

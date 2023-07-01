@@ -5,6 +5,7 @@ namespace Danilovl\CacheResponseBundle\EventListener;
 use Danilovl\CacheResponseBundle\Attribute\CacheResponseAttribute;
 use Psr\Cache\CacheItemPoolInterface;
 use ReflectionClass;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -12,7 +13,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 readonly class KernelControllerListener implements EventSubscriberInterface
 {
-    public function __construct(private CacheItemPoolInterface $cacheItemPool) {}
+    public function __construct(
+        private CacheItemPoolInterface $cacheItemPool,
+        private ContainerInterface $container
+    ) {}
 
     public function onKernelController(ControllerEvent $event): void
     {
@@ -49,9 +53,15 @@ readonly class KernelControllerListener implements EventSubscriberInterface
         ControllerEvent $event,
         CacheResponseAttribute $hashidsParamConverterAttribute
     ): void {
-        $event->getRequest()->attributes->set(CacheResponseAttribute::REQUEST_ATTRIBUTES_CACHE_USED, false);
+        $request = $event->getRequest();
+        $request->attributes->set(CacheResponseAttribute::REQUEST_ATTRIBUTES_CACHE_USED, false);
 
-        $cacheKey = $hashidsParamConverterAttribute->getCacheKey($event->getRequest());
+        $cacheFactory = null;
+        if ($hashidsParamConverterAttribute->cacheKeyFactory !== null) {
+            $cacheFactory = $this->container->get($hashidsParamConverterAttribute->cacheKeyFactory);
+        }
+
+        $cacheKey = $cacheFactory?->getCacheKey() ?? $hashidsParamConverterAttribute->getCacheKey($request);
         $cache = $this->cacheItemPool->getItem($cacheKey);
 
         if (!$cache->isHit()) {
