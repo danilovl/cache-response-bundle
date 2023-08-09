@@ -5,6 +5,7 @@ namespace Danilovl\CacheResponseBundle\Tests\EventListener;
 use Danilovl\CacheResponseBundle\Attribute\CacheResponseAttribute;
 use Danilovl\CacheResponseBundle\EventListener\KernelResponseListener;
 use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Danilovl\CacheResponseBundle\Tests\{
     TestController,
     TestCacheKeyFactory
@@ -22,9 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class KernelResponseListenerTest extends TestCase
 {
-    /**
-     * @dataProvider dataControllerMethod
-     */
+    #[DataProvider('dataControllerMethod')]
     public function testOnKernelResponseCreateCache(string $method): void
     {
         $controllerResponse = (new TestController)->{$method}();
@@ -59,7 +58,7 @@ class KernelResponseListenerTest extends TestCase
         $this->assertEquals($controllerResponse->getContent(), $response->getContent());
     }
 
-    public function dataControllerMethod(): Generator
+    public static function dataControllerMethod(): Generator
     {
         yield ['index'];
         yield ['cacheKeyFactory'];

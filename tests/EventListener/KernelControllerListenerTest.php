@@ -4,6 +4,7 @@ namespace Danilovl\CacheResponseBundle\Tests\EventListener;
 
 use Danilovl\CacheResponseBundle\EventListener\KernelControllerListener;
 use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Danilovl\CacheResponseBundle\Tests\{
     TestController,
     TestCacheKeyFactory
@@ -23,9 +24,7 @@ use Symfony\Component\HttpKernel\{
 
 class KernelControllerListenerTest extends TestCase
 {
-    /**
-     * @dataProvider dataControllerMethod
-     */
+    #[DataProvider('dataControllerMethod')]
     public function testOnKernelControllerExistCache(string $method): void
     {
         $event = new ControllerEvent(
@@ -60,9 +59,7 @@ class KernelControllerListenerTest extends TestCase
         $this->assertEquals($controllerResponse->getContent(), $response->getContent());
     }
 
-    /**
-     * @dataProvider dataControllerMethod
-     */
+    #[DataProvider('dataControllerMethod')]
     public function testOnKernelControllerNotExistCache(string $method): void
     {
         $event = new ControllerEvent(
@@ -93,7 +90,7 @@ class KernelControllerListenerTest extends TestCase
         $this->assertNull($response);
     }
 
-    public function dataControllerMethod(): Generator
+    public static function dataControllerMethod(): Generator
     {
         yield ['index'];
         yield ['cacheKeyFactory'];
