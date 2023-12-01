@@ -6,7 +6,7 @@ use Danilovl\CacheResponseBundle\Interfaces\CacheKeyFactoryInterface;
 
 class TestCacheKeyFactory implements CacheKeyFactoryInterface
 {
-    public const CACHE_KEY = 'TestCacheKeyFactory';
+    public const string CACHE_KEY = 'TestCacheKeyFactory';
 
     public function getCacheKey(): string
     {

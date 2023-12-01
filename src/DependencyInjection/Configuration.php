@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    public const ALIAS = 'danilovl_cache_response';
+    public const string ALIAS = 'danilovl_cache_response';
 
     public function getConfigTreeBuilder(): NodeParentInterface
     {

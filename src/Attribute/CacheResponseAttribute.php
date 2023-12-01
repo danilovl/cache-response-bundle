@@ -11,8 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 #[Attribute]
 class CacheResponseAttribute
 {
-    public const CACHE_KEY_PREFIX = 'danilovl.cache_response.';
-    public const REQUEST_ATTRIBUTES_CACHE_USED = 'danilovl.cache_response_used';
+    public const string CACHE_KEY_PREFIX = 'danilovl.cache_response.';
+    public const string REQUEST_ATTRIBUTES_CACHE_USED = 'danilovl.cache_response_used';
 
     public readonly ?string $originalCacheKey;
     public readonly ?string $cacheKey;

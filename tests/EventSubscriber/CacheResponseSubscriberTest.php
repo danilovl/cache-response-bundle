@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CacheResponseSubscriberTest extends TestCase
 {
-    private const CLEAR_CACHE_RESPONSE_KEY = 'cache.key.test';
+    private const string CLEAR_CACHE_RESPONSE_KEY = 'cache.key.test';
 
     private CacheItemPoolInterface $cacheItemPool;
     private CacheResponseSubscriber $subscriber;
