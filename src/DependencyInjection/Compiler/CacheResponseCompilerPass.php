@@ -36,7 +36,9 @@ class CacheResponseCompilerPass implements CompilerPassInterface
         }
 
         $cacheServiceContainer = $container->getDefinition($cacheService);
-        $implements = class_implements($cacheServiceContainer->getClass(), false);
+        /** @var string $class */
+        $class = $cacheServiceContainer->getClass();
+        $implements = class_implements($class, false);
         $implementCacheItemPoolInterface = $implements[CacheItemPoolInterface::class] ?? false;
 
         if (!$implementCacheItemPoolInterface) {

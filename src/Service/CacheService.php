@@ -17,7 +17,10 @@ class CacheService
             return [];
         }
 
-        return $attributeCacheKeys->get() ?? [];
+        /** @var array $result */
+        $result = $attributeCacheKeys->get() ?? [];
+
+        return $result;
     }
 
     function findSimilarCacheKeys(string $attributeCacheKey): array

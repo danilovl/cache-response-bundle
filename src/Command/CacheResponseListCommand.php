@@ -3,6 +3,7 @@
 namespace Danilovl\CacheResponseBundle\Command;
 
 use Danilovl\CacheResponseBundle\Attribute\CacheResponseAttribute;
+use Danilovl\CacheResponseBundle\Interfaces\CacheKeyFactoryInterface;
 use Danilovl\CacheResponseBundle\Service\CacheService;
 use DateInterval;
 use DateTimeInterface;
@@ -34,8 +35,9 @@ class CacheResponseListCommand extends Command
             ->setHeaders(['Controller', 'Action', 'Cache info', 'Cache key factory', 'Expires after', 'Expires at', 'With query', 'Wth request']);
 
         foreach ($routes as $route) {
+            /** @var string|null $controller */
             $controller = $route->getDefault('_controller');
-            if (!str_contains($controller, '::')) {
+            if ($controller == null || !str_contains($controller, '::')) {
                 continue;
             }
 
@@ -59,9 +61,11 @@ class CacheResponseListCommand extends Command
 
             $cacheFactory = null;
             if ($attribute->cacheKeyFactory !== null) {
+                /** @var CacheKeyFactoryInterface|null $cacheFactory */
                 $cacheFactory = $this->container->get($attribute->cacheKeyFactory);
             }
 
+            /** @var string $cacheKey */
             $cacheKey = $cacheFactory?->getCacheKey() ?? $attribute->cacheKey;
             $actuallyInCache = $this->cacheService->findSimilarCacheKeys($cacheKey);
             $originalCacheKey = $attribute->originalCacheKey ?? $cacheFactory?->getCacheKey();
@@ -92,13 +96,13 @@ class CacheResponseListCommand extends Command
         return Command::SUCCESS;
     }
 
-    function getFormattedExpiration(int|DateInterval|null $expiration): mixed
+    function getFormattedExpiration(int|DateInterval|DateTimeInterface|null $expiration): mixed
     {
         $result = 'no';
 
         if (is_int($expiration)) {
             $result = $expiration;
-        } elseif ($expiration instanceof DateTimeInterface) {
+        } elseif ($expiration !== null) {
             $result = $expiration->format('Y-m-d H:i:s');
         }
 

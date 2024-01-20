@@ -3,6 +3,7 @@
 namespace Danilovl\CacheResponseBundle\EventListener;
 
 use Danilovl\CacheResponseBundle\Attribute\CacheResponseAttribute;
+use Danilovl\CacheResponseBundle\Interfaces\CacheKeyFactoryInterface;
 use Danilovl\CacheResponseBundle\Service\CacheService;
 use Psr\Cache\CacheItemPoolInterface;
 use ReflectionClass;
@@ -24,12 +25,13 @@ readonly class KernelResponseListener implements EventSubscriberInterface
             return;
         }
 
+        /** @var string $controllerAttribute */
         $controllerAttribute = $event->getRequest()->attributes->get('_controller');
         if (!str_contains($controllerAttribute, '::')) {
             return;
         }
 
-        [$controller, $method] = explode('::', $event->getRequest()->attributes->get('_controller'));
+        [$controller, $method] = explode('::', $controllerAttribute);
 
         if (!class_exists($controller)) {
             return;
@@ -66,6 +68,7 @@ readonly class KernelResponseListener implements EventSubscriberInterface
 
         $cacheFactory = null;
         if ($hashidsParamConverterAttribute->cacheKeyFactory !== null) {
+            /** @var CacheKeyFactoryInterface|null $cacheFactory */
             $cacheFactory = $this->container->get($hashidsParamConverterAttribute->cacheKeyFactory);
         }
 
@@ -92,6 +95,7 @@ readonly class KernelResponseListener implements EventSubscriberInterface
         $keys = [];
 
         if ($attributeCacheKeys->isHit()) {
+            /** @var array $keys */
             $keys = $attributeCacheKeys->get();
         }
 

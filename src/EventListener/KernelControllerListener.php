@@ -3,6 +3,7 @@
 namespace Danilovl\CacheResponseBundle\EventListener;
 
 use Danilovl\CacheResponseBundle\Attribute\CacheResponseAttribute;
+use Danilovl\CacheResponseBundle\Interfaces\CacheKeyFactoryInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use ReflectionClass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -58,6 +59,7 @@ readonly class KernelControllerListener implements EventSubscriberInterface
 
         $cacheFactory = null;
         if ($hashidsParamConverterAttribute->cacheKeyFactory !== null) {
+            /** @var CacheKeyFactoryInterface|null $cacheFactory */
             $cacheFactory = $this->container->get($hashidsParamConverterAttribute->cacheKeyFactory);
         }
 

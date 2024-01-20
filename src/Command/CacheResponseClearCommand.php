@@ -32,6 +32,7 @@ class CacheResponseClearCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $all = $input->getOption('all');
+        /** @var string|null $deleteCacheKey */
         $deleteCacheKey = $input->getOption('cacheKey');
 
         if ($all === null && $deleteCacheKey === null) {
@@ -63,7 +64,10 @@ class CacheResponseClearCommand extends Command
             $this->cacheItemPool->deleteItems($deleteCacheKeys);
 
             $attributeCacheKeysItem = $this->cacheItemPool->getItem(CacheService::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
-            $newCacheKeys = array_diff($attributeCacheKeysItem->get(), $deleteCacheKeys);
+
+            /** @var array $cacheKeysItem */
+            $cacheKeysItem = $attributeCacheKeysItem->get();
+            $newCacheKeys = array_diff($cacheKeysItem, $deleteCacheKeys);
 
             $attributeCacheKeysItem->set($newCacheKeys);
             $this->cacheItemPool->save($attributeCacheKeysItem);

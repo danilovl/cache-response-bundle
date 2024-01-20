@@ -27,9 +27,12 @@ class KernelControllerListenerTest extends TestCase
     #[DataProvider('dataControllerMethod')]
     public function testOnKernelControllerExistCache(string $method): void
     {
+        /** @var callable $callable */
+        $callable = [new TestController, $method];
+
         $event = new ControllerEvent(
             $this->createMock(KernelInterface::class),
-            [new TestController, $method],
+            $callable,
             new Request,
             HttpKernelInterface::MAIN_REQUEST
         );
@@ -62,9 +65,12 @@ class KernelControllerListenerTest extends TestCase
     #[DataProvider('dataControllerMethod')]
     public function testOnKernelControllerNotExistCache(string $method): void
     {
+        /** @var callable $callable */
+        $callable = [new TestController, $method];
+
         $event = new ControllerEvent(
             $this->createMock(KernelInterface::class),
-            [new TestController, $method],
+            $callable,
             new Request,
             HttpKernelInterface::MAIN_REQUEST
         );
