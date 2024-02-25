@@ -12,11 +12,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-readonly class KernelResponseListener implements EventSubscriberInterface
+class KernelResponseListener implements EventSubscriberInterface
 {
     public function __construct(
-        private CacheItemPoolInterface $cacheItemPool,
-        private ContainerInterface $container
+        private readonly CacheItemPoolInterface $cacheItemPool,
+        private readonly ContainerInterface $container
     ) {}
 
     public function onKernelResponse(ResponseEvent $event): void
@@ -27,11 +27,20 @@ readonly class KernelResponseListener implements EventSubscriberInterface
 
         /** @var string $controllerAttribute */
         $controllerAttribute = $event->getRequest()->attributes->get('_controller');
-        if (!str_contains($controllerAttribute, '::')) {
-            return;
+
+        $controller = null;
+        $method = null;
+
+        if (is_array($controllerAttribute)) {
+            $controller = $controllerAttribute[0] ?? null;
+            $method = $controllerAttribute[1] ?? null;
+        } elseif (is_string($controllerAttribute) && str_contains($controllerAttribute, '::')) {
+            [$controller, $method] = explode('::', $controllerAttribute);
         }
 
-        [$controller, $method] = explode('::', $controllerAttribute);
+        if ($controller === null || $method === null) {
+            return;
+        }
 
         if (!class_exists($controller)) {
             return;
