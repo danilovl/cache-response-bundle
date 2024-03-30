@@ -27,7 +27,7 @@ After:
 Install `danilovl/cache-response-bundle` package by Composer:
 
 ``` bash
-$ composer require danilovl/cache-response-bundle
+composer require danilovl/cache-response-bundle
 ```
 
 Add the `CacheResponseBundle` to your application's bundles if does not add automatically:
