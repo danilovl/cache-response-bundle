@@ -32,7 +32,7 @@ readonly class CacheResponseAttribute
 
         if ($cacheKey !== null) {
             $this->originalCacheKey = $cacheKey;
-            $this->cacheKey = self::CACHE_KEY_PREFIX . $cacheKey;
+            $this->cacheKey = self::CACHE_KEY_PREFIX . sha1($cacheKey);
         } else {
             $this->originalCacheKey = null;
             $this->cacheKey = null;

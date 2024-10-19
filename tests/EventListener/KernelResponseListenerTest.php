@@ -46,7 +46,7 @@ class KernelResponseListenerTest extends TestCase
         $subscriber = new KernelResponseListener($cacheItemPool, $container);
         $subscriber->onKernelResponse($event);
 
-        $cacheKey = CacheResponseAttribute::getCacheKeyWithPrefix($method);
+        $cacheKey = CacheResponseAttribute::getCacheKeyWithPrefix(sha1($method));
         if ($method === 'cacheKeyFactory') {
             $cacheKey = $testCacheKeyFactory->getCacheKey();
         }

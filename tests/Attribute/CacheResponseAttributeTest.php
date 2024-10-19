@@ -37,19 +37,22 @@ class CacheResponseAttributeTest extends TestCase
 
     public function testGetCacheKey(): void
     {
-        $cacheResponseAttribute = new CacheResponseAttribute('test.key');
+        $cacheKey = 'test.key';
+        $cacheResponseAttribute = new CacheResponseAttribute($cacheKey);
 
         $this->assertEquals(
-            CacheResponseAttribute::CACHE_KEY_PREFIX . 'test.key',
+            CacheResponseAttribute::CACHE_KEY_PREFIX . sha1($cacheKey),
             $cacheResponseAttribute->getCacheKey(new Request)
         );
     }
 
     public function testGetCacheKeyWithPrefix(): void
     {
+        $cacheKey = '8414b2ff0a6fafcddc0f42d6d5a5b908d34925c3';
+
         $this->assertEquals(
-            CacheResponseAttribute::CACHE_KEY_PREFIX . 'test.key',
-            CacheResponseAttribute::getCacheKeyWithPrefix('test.key')
+            CacheResponseAttribute::CACHE_KEY_PREFIX . $cacheKey,
+            CacheResponseAttribute::getCacheKeyWithPrefix($cacheKey)
         );
     }
 
