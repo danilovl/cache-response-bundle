@@ -12,15 +12,23 @@ use Symfony\Component\Console\Input\{
     InputOption
 };
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(name: 'danilovl:cache-response:clear', description: 'Clear cache response.')]
 class CacheResponseClearCommand extends Command
 {
+    private SymfonyStyle $io;
+
     public function __construct(
         private readonly CacheItemPoolInterface $cacheItemPool,
         private readonly CacheService $cacheService
     ) {
         parent::__construct();
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        $this->io = new SymfonyStyle($input, $output);
     }
 
     protected function configure(): void
@@ -36,7 +44,13 @@ class CacheResponseClearCommand extends Command
         $deleteCacheKey = $input->getOption('cacheKey');
 
         if ($all === null && $deleteCacheKey === null) {
-            $output->writeln('You must specify at least one option.');
+            $this->io->error('You must specify at least one option.');
+
+            return Command::FAILURE;
+        }
+
+        if ($deleteCacheKey !== null && empty($deleteCacheKey)) {
+            $this->io->error('CacheKey option must not be empty.');
 
             return Command::FAILURE;
         }
@@ -44,6 +58,8 @@ class CacheResponseClearCommand extends Command
         if ($all) {
             $this->cacheItemPool->deleteItems($this->cacheService->getCacheKeys());
             $this->cacheItemPool->deleteItem(CacheService::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
+
+            $this->io->success('Done.');
 
             return Command::SUCCESS;
         }
@@ -55,7 +71,7 @@ class CacheResponseClearCommand extends Command
             $similarCacheKeys = $this->cacheService->findSimilarCacheKeys($deleteCacheKey);
 
             if (count($similarCacheKeys) === 0) {
-                $output->writeln('Cache key not found or actually cache for this key is already empty.');
+                $this->io->error('Cache key not found or actually cache for this key is already empty.');
 
                 return Command::FAILURE;
             }
@@ -72,6 +88,8 @@ class CacheResponseClearCommand extends Command
             $attributeCacheKeysItem->set($newCacheKeys);
             $this->cacheItemPool->save($attributeCacheKeysItem);
         }
+
+        $this->io->success('Done.');
 
         return Command::SUCCESS;
     }
