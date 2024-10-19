@@ -100,19 +100,21 @@ public function index(Request $request): Response
 Show all used `CacheResponseAttribute` cache key names.
 
 ```php
-bin/console danilovl:cache-response:list 
+php bin/console danilovl:cache-response:list 
 ```
+
+![Alt text](/.github/readme/console_command_list.png?raw=true "Console command list")
 
 Clear all `CacheResponseAttribute` cache.
 
 ```php
-bin/console danilovl:cache-response:clear --all=true
+php bin/console danilovl:cache-response:clear --all=true
 ```
 
 Clear only specific `CacheResponseAttribute` cache key name.
 
 ```php
-bin/console danilovl:cache-response:clear --cacheKey=index
+php bin/console danilovl:cache-response:clear --cacheKey=index
 ```
 
 #### 2.3 EventSubscriber
