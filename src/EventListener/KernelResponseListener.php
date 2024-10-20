@@ -80,7 +80,7 @@ class KernelResponseListener implements EventSubscriberInterface
             $cacheFactory = $this->container->get($cacheResponseAttribute->cacheKeyFactory);
             $cacheKey = $cacheFactory->getCacheKey();
         } else {
-            $cacheKey = $cacheResponseAttribute->getCacheKey($request);
+            $cacheKey = $cacheResponseAttribute->getCacheKeyForRequest($request);
         }
 
         $cache = $this->cacheItemPool->getItem($cacheKey);

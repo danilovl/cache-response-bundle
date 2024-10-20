@@ -59,22 +59,23 @@ class CacheResponseListCommand extends Command
             /** @var CacheResponseAttribute $attribute */
             $attribute = $attributes->newInstance();
 
-            $cacheFactory = null;
             if ($attribute->cacheKeyFactory !== null) {
-                /** @var CacheKeyFactoryInterface|null $cacheFactory */
+                /** @var CacheKeyFactoryInterface $cacheFactory */
                 $cacheFactory = $this->container->get($attribute->cacheKeyFactory);
+                $cacheKey = $cacheFactory->getCacheKey();
+                $originalCacheKey = $cacheKey;
+            } else {
+                $cacheKey = $attribute->getCacheKeyNotNull();
+                $originalCacheKey = $attribute->originalCacheKey;
             }
 
-            /** @var string $cacheKey */
-            $cacheKey = $cacheFactory?->getCacheKey() ?? $attribute->cacheKey;
             $actuallyInCache = $this->cacheService->findSimilarCacheKeys($cacheKey);
-            $originalCacheKey = $attribute->originalCacheKey ?? $cacheFactory?->getCacheKey();
 
             $table->addRow([
                 $controller,
                 $method,
                 'Original cache key:',
-                $cacheFactory !== null ? 'yes' : 'no',
+                $attribute->cacheKeyFactory !== null ? 'yes' : 'no',
                 $this->getFormattedExpiration($attribute->expiresAfter),
                 $this->getFormattedExpiration($attribute->expiresAt),
                 $attribute->cacheKeyWithQuery ? 'yes' : 'no',

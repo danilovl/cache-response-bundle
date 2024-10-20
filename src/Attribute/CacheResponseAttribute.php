@@ -46,7 +46,16 @@ readonly class CacheResponseAttribute
         }
     }
 
-    public function getCacheKey(Request $request): string
+    public function getCacheKeyNotNull(): string
+    {
+        if ($this->cacheKey === null) {
+            throw new CacheResponseInvalidArgumentException('CacheKey can not be null.');
+        }
+
+        return $this->cacheKey;
+    }
+
+    public function getCacheKeyForRequest(Request $request): string
     {
         if ($this->cacheKey === null) {
             throw new CacheResponseInvalidArgumentException('CacheKey is required when CacheKeyFactory is not set.');

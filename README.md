@@ -99,7 +99,7 @@ public function index(Request $request): Response
 
 Show all used `CacheResponseAttribute` cache key names.
 
-```php
+```bash
 php bin/console danilovl:cache-response:list 
 ```
 
@@ -107,14 +107,34 @@ php bin/console danilovl:cache-response:list
 
 Clear all `CacheResponseAttribute` cache.
 
-```php
+```bash
 php bin/console danilovl:cache-response:clear --all=true
 ```
 
 Clear only specific `CacheResponseAttribute` cache key name.
 
-```php
+```bash
 php bin/console danilovl:cache-response:clear --cacheKey=index
+```
+
+Clear all similar `CacheResponseAttribute` cache key name.
+
+```php
+0 => "danilovl.cache_response.8414b2ff0a6fafcddc0f42d6d5a5b908d34925c3"
+1 => "danilovl.cache_response.8414b2ff08997b2bd029eaab1a04598a500a0034"
+```
+
+```bash
+php bin/console danilovl:cache-response:clear --similarCacheKey=8414b2ff0
+```
+
+```php
+0 => "danilovl.cache_response.8414b2ff0a6fafcddc0f42d6d5a5b90similar"
+1 => "danilovl.cache_response.8414b2ff08997b2bd029eaab1a04598similar"
+```
+
+```bash
+php bin/console danilovl:cache-response:clear --cacheKey=similar
 ```
 
 #### 2.3 EventSubscriber

@@ -10,6 +10,9 @@ class CacheService
 
     public function __construct(private readonly CacheItemPoolInterface $cacheItemPool) {}
 
+    /**
+     * @return string[]
+     */
     public function getCacheKeys(): array
     {
         $attributeCacheKeys = $this->cacheItemPool->getItem(CacheService::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
@@ -17,16 +20,26 @@ class CacheService
             return [];
         }
 
-        /** @var array $result */
+        /** @var string[] $result */
         $result = $attributeCacheKeys->get() ?? [];
 
         return $result;
     }
 
-    function findSimilarCacheKeys(string $attributeCacheKey): array
+    /**
+     * @return string[]
+     */
+    public function findSimilarCacheKeys(string $attributeCacheKey): array
     {
         $cacheKeys = $this->getCacheKeys();
 
         return array_filter($cacheKeys, static fn(string $cacheKey): bool => str_contains($cacheKey, $attributeCacheKey));
+    }
+
+    public function isCacheKeyExistInCache(string $cacheKey): bool
+    {
+        $cacheKeys = $this->getCacheKeys();
+
+        return in_array($cacheKey, $cacheKeys, true);
     }
 }

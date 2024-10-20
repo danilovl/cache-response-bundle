@@ -35,14 +35,35 @@ class CacheResponseAttributeTest extends TestCase
         new CacheResponseAttribute(cacheKeyFactory: TestController::class);
     }
 
-    public function testGetCacheKey(): void
+    public function testGetCacheKeyNotNull(): void
     {
         $cacheKey = 'test.key';
         $cacheResponseAttribute = new CacheResponseAttribute($cacheKey);
 
         $this->assertEquals(
             CacheResponseAttribute::CACHE_KEY_PREFIX . sha1($cacheKey),
-            $cacheResponseAttribute->getCacheKey(new Request)
+            $cacheResponseAttribute->getCacheKeyNotNull()
+        );
+    }
+
+    public function testGetCacheKeyNotNullException(): void
+    {
+        $cacheResponseAttribute = new CacheResponseAttribute(cacheKeyFactory: TestCacheKeyFactory::class);
+
+        $this->expectException(CacheResponseInvalidArgumentException::class);
+        $this->expectExceptionMessage('CacheKey can not be null.');
+
+        $cacheResponseAttribute->getCacheKeyNotNull();
+    }
+
+    public function testGetCacheKeyForRequest(): void
+    {
+        $cacheKey = 'test.key';
+        $cacheResponseAttribute = new CacheResponseAttribute($cacheKey);
+
+        $this->assertEquals(
+            CacheResponseAttribute::CACHE_KEY_PREFIX . sha1($cacheKey),
+            $cacheResponseAttribute->getCacheKeyForRequest(new Request)
         );
     }
 

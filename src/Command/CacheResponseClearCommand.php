@@ -34,7 +34,8 @@ class CacheResponseClearCommand extends Command
     protected function configure(): void
     {
         $this->addOption('all', null, InputOption::VALUE_OPTIONAL, 'Delete all cache items.')
-            ->addOption('cacheKey', null, InputOption::VALUE_OPTIONAL, 'Delete only by cache key.');
+            ->addOption('cacheKey', null, InputOption::VALUE_OPTIONAL, 'Delete only by cache key.')
+            ->addOption('similarCacheKey', null, InputOption::VALUE_OPTIONAL, 'Delete all similar cache key.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -42,15 +43,23 @@ class CacheResponseClearCommand extends Command
         $all = $input->getOption('all');
         /** @var string|null $deleteCacheKey */
         $deleteCacheKey = $input->getOption('cacheKey');
+        /** @var string|null $deleteSimilarCacheKey */
+        $deleteSimilarCacheKey = $input->getOption('similarCacheKey');
 
-        if ($all === null && $deleteCacheKey === null) {
-            $this->io->error('You must specify at least one option.');
+        if ($all === null && $deleteCacheKey === null && $deleteSimilarCacheKey === null) {
+            $this->io->error('You must specify at least one option: all, cacheKey, similarCacheKey.');
 
             return Command::FAILURE;
         }
 
         if ($deleteCacheKey !== null && empty($deleteCacheKey)) {
-            $this->io->error('CacheKey option must not be empty.');
+            $this->io->error('cacheKey option must not be empty.');
+
+            return Command::FAILURE;
+        }
+
+        if ($deleteSimilarCacheKey !== null && empty($deleteSimilarCacheKey)) {
+            $this->io->error('similarCacheKey option must not be empty.');
 
             return Command::FAILURE;
         }
@@ -64,19 +73,31 @@ class CacheResponseClearCommand extends Command
             return Command::SUCCESS;
         }
 
-        if ($deleteCacheKey) {
-            $deleteCacheKey = CacheResponseAttribute::getCacheKeyWithPrefix($deleteCacheKey);
+        if ($deleteCacheKey || $deleteSimilarCacheKey) {
+            $deleteCacheKeys = [];
 
-            $deleteCacheKeys = [$deleteCacheKey];
-            $similarCacheKeys = $this->cacheService->findSimilarCacheKeys($deleteCacheKey);
+            if ($deleteCacheKey) {
+                $deleteCacheKey = CacheResponseAttribute::getCacheKeyWithPrefix($deleteCacheKey);
+                if (!$this->cacheService->isCacheKeyExistInCache($deleteCacheKey)) {
+                    $this->io->warning('Cache key not found or actually cache for this key is already empty.');
 
-            if (count($similarCacheKeys) === 0) {
-                $this->io->error('Cache key not found or actually cache for this key is already empty.');
+                    return Command::FAILURE;
+                }
 
-                return Command::FAILURE;
+                $deleteCacheKeys[] = $deleteCacheKey;
             }
 
-            $deleteCacheKeys = array_merge($deleteCacheKeys, $similarCacheKeys);
+            if ($deleteSimilarCacheKey) {
+                $similarCacheKeys = $this->cacheService->findSimilarCacheKeys($deleteSimilarCacheKey);
+                if (count($similarCacheKeys) === 0) {
+                    $this->io->warning('Cache key not found or actually cache for this key is already empty.');
+
+                    return Command::FAILURE;
+                }
+
+                $deleteCacheKeys = array_merge($deleteCacheKeys, $similarCacheKeys);
+            }
+
             $this->cacheItemPool->deleteItems($deleteCacheKeys);
 
             $attributeCacheKeysItem = $this->cacheItemPool->getItem(CacheService::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
