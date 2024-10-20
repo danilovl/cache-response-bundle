@@ -5,7 +5,7 @@ namespace Danilovl\CacheResponseBundle\Tests\EventListener;
 use Danilovl\CacheResponseBundle\EventListener\KernelControllerListener;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Danilovl\CacheResponseBundle\Tests\{
+use Danilovl\CacheResponseBundle\Tests\Mock\{
     TestController,
     TestCacheKeyFactory
 };

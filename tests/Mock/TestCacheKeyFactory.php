@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Danilovl\CacheResponseBundle\Tests;
+namespace Danilovl\CacheResponseBundle\Tests\Mock;
 
 use Danilovl\CacheResponseBundle\Interfaces\CacheKeyFactoryInterface;
 

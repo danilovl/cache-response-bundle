@@ -6,7 +6,8 @@ use Danilovl\CacheResponseBundle\Attribute\CacheResponseAttribute;
 use Danilovl\CacheResponseBundle\EventListener\KernelResponseListener;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Danilovl\CacheResponseBundle\Tests\{
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Danilovl\CacheResponseBundle\Tests\Mock\{
     TestController,
     TestCacheKeyFactory
 };
@@ -56,6 +57,31 @@ class KernelResponseListenerTest extends TestCase
         $response = $cache->get();
 
         $this->assertEquals($controllerResponse->getContent(), $response->getContent());
+    }
+
+    public function testOnKernelResponseFactoryException(): void
+    {
+        $this->expectException(ServiceNotFoundException::class);
+
+        $controllerResponse = (new TestController)->cacheKeyFactoryException();
+
+        $event = new ResponseEvent(
+            $this->createMock(KernelInterface::class),
+            new Request(
+                attributes: ['_controller' => TestController::class . '::cacheKeyFactoryException'],
+            ),
+            HttpKernelInterface::MAIN_REQUEST,
+            $controllerResponse
+        );
+
+        $testCacheKeyFactory = new TestCacheKeyFactory;
+        $cacheItemPool = new ArrayAdapter;
+
+        $container = new Container;
+        $container->set(TestCacheKeyFactory::class, $testCacheKeyFactory);
+
+        $subscriber = new KernelResponseListener($cacheItemPool, $container);
+        $subscriber->onKernelResponse($event);
     }
 
     public static function dataControllerMethod(): Generator

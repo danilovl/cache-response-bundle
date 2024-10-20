@@ -4,7 +4,7 @@ namespace Danilovl\CacheResponseBundle\Tests\Attribute;
 
 use Danilovl\CacheResponseBundle\Attribute\CacheResponseAttribute;
 use Danilovl\CacheResponseBundle\Exception\CacheResponseInvalidArgumentException;
-use Danilovl\CacheResponseBundle\Tests\{
+use Danilovl\CacheResponseBundle\Tests\Mock\{
     TestController,
     TestCacheKeyFactory
 };

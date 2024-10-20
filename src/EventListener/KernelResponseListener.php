@@ -67,7 +67,7 @@ class KernelResponseListener implements EventSubscriberInterface
 
     private function handleResponse(
         ResponseEvent $event,
-        CacheResponseAttribute $hashidsParamConverterAttribute
+        CacheResponseAttribute $cacheResponseAttribute
     ): void {
         $request = $event->getRequest();
         $isCacheUsed = $request->attributes->get(CacheResponseAttribute::REQUEST_ATTRIBUTES_CACHE_USED);
@@ -75,27 +75,27 @@ class KernelResponseListener implements EventSubscriberInterface
             return;
         }
 
-        $cacheFactory = null;
-        if ($hashidsParamConverterAttribute->cacheKeyFactory !== null) {
-            /** @var CacheKeyFactoryInterface|null $cacheFactory */
-            $cacheFactory = $this->container->get($hashidsParamConverterAttribute->cacheKeyFactory);
+        if ($cacheResponseAttribute->cacheKeyFactory !== null) {
+            /** @var CacheKeyFactoryInterface $cacheFactory */
+            $cacheFactory = $this->container->get($cacheResponseAttribute->cacheKeyFactory);
+            $cacheKey = $cacheFactory->getCacheKey();
+        } else {
+            $cacheKey = $cacheResponseAttribute->getCacheKey($request);
         }
 
-        $cacheKey = $cacheFactory?->getCacheKey() ?? $hashidsParamConverterAttribute->getCacheKey($request);
         $cache = $this->cacheItemPool->getItem($cacheKey);
-
         if ($cache->isHit()) {
             return;
         }
 
         $cache->set($event->getResponse());
 
-        if ($hashidsParamConverterAttribute->expiresAfter) {
-            $cache->expiresAfter($hashidsParamConverterAttribute->expiresAfter);
+        if ($cacheResponseAttribute->expiresAfter) {
+            $cache->expiresAfter($cacheResponseAttribute->expiresAfter);
         }
 
-        if ($hashidsParamConverterAttribute->expiresAt) {
-            $cache->expiresAt($hashidsParamConverterAttribute->expiresAt);
+        if ($cacheResponseAttribute->expiresAt) {
+            $cache->expiresAt($cacheResponseAttribute->expiresAt);
         }
 
         $this->cacheItemPool->save($cache);
