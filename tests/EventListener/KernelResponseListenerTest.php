@@ -14,13 +14,15 @@ use Danilovl\CacheResponseBundle\Tests\Mock\{
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\{
+    Request,
+    Response
+};
 use Symfony\Component\HttpKernel\{
     Event\ResponseEvent,
     KernelInterface,
     HttpKernelInterface
 };
-use Symfony\Component\HttpFoundation\Response;
 
 class KernelResponseListenerTest extends TestCase
 {

@@ -13,6 +13,7 @@ use Psr\Cache\{
 class CacheServiceTest extends TestCase
 {
     private MockObject $cacheItemPool;
+
     private CacheService $cacheService;
 
     protected function setUp(): void

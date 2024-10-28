@@ -2,6 +2,4 @@
 
 namespace Danilovl\CacheResponseBundle\EventSubscriber\Event;
 
-readonly class ClearCacheResponseAllEvent
-{
-}
+readonly class ClearCacheResponseAllEvent {}

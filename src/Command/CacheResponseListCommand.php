@@ -97,7 +97,7 @@ class CacheResponseListCommand extends Command
         return Command::SUCCESS;
     }
 
-    function getFormattedExpiration(int|DateInterval|DateTimeInterface|null $expiration): mixed
+    public function getFormattedExpiration(int|DateInterval|DateTimeInterface|null $expiration): mixed
     {
         $result = 'no';
 

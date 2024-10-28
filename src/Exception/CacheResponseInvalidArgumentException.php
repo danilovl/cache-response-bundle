@@ -4,6 +4,4 @@ namespace Danilovl\CacheResponseBundle\Exception;
 
 use InvalidArgumentException;
 
-class CacheResponseInvalidArgumentException extends InvalidArgumentException
-{
-}
+class CacheResponseInvalidArgumentException extends InvalidArgumentException {}

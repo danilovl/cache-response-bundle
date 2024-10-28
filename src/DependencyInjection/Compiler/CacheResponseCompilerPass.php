@@ -12,10 +12,12 @@ use Danilovl\CacheResponseBundle\EventListener\{
     KernelControllerListener
 };
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\{
+    Processor,
+    ConfigurationInterface
+};
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Config\Definition\Processor;
 
 class CacheResponseCompilerPass implements CompilerPassInterface
 {

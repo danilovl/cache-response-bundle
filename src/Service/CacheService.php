@@ -15,7 +15,7 @@ class CacheService
      */
     public function getCacheKeys(): array
     {
-        $attributeCacheKeys = $this->cacheItemPool->getItem(CacheService::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
+        $attributeCacheKeys = $this->cacheItemPool->getItem(self::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
         if (!$attributeCacheKeys->isHit()) {
             return [];
         }
@@ -33,7 +33,7 @@ class CacheService
     {
         $cacheKeys = $this->getCacheKeys();
 
-        return array_filter($cacheKeys, static fn(string $cacheKey): bool => str_contains($cacheKey, $attributeCacheKey));
+        return array_filter($cacheKeys, static fn (string $cacheKey): bool => str_contains($cacheKey, $attributeCacheKey));
     }
 
     public function isCacheKeyExistInCache(string $cacheKey): bool

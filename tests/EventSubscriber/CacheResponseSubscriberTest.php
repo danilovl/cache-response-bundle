@@ -18,7 +18,9 @@ class CacheResponseSubscriberTest extends TestCase
     private const string CLEAR_CACHE_RESPONSE_KEY = 'cache.key.test';
 
     private CacheItemPoolInterface $cacheItemPool;
+
     private CacheResponseSubscriber $subscriber;
+
     private EventDispatcher $eventDispatcher;
 
     protected function setUp(): void
@@ -36,7 +38,7 @@ class CacheResponseSubscriberTest extends TestCase
         $cacheService = new CacheService($this->cacheItemPool);
         $this->subscriber = new CacheResponseSubscriber($this->cacheItemPool, $cacheService);
 
-        $this->eventDispatcher = new EventDispatcher();
+        $this->eventDispatcher = new EventDispatcher;
         $this->eventDispatcher->addListener(ClearCacheResponseKeyEvent::class, [$this->subscriber, 'onClearCacheKey']);
         $this->eventDispatcher->addListener(ClearCacheResponseAllEvent::class, [$this->subscriber, 'onClearCacheAll']);
     }

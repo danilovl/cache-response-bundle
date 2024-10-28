@@ -75,7 +75,7 @@ readonly class KernelControllerListener implements EventSubscriberInterface
             return;
         }
 
-        $event->setController(static fn(): Response => $cacheResponse);
+        $event->setController(static fn (): Response => $cacheResponse);
         $event->getRequest()->attributes->set(CacheResponseAttribute::REQUEST_ATTRIBUTES_CACHE_USED, true);
     }
 

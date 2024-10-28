@@ -16,6 +16,7 @@ readonly class CacheResponseAttribute
     public const string REQUEST_ATTRIBUTES_CACHE_USED = 'danilovl.cache_response_used';
 
     public ?string $originalCacheKey;
+
     public ?string $cacheKey;
 
     public function __construct(
