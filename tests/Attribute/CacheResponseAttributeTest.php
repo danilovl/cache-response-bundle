@@ -15,10 +15,10 @@ class CacheResponseAttributeTest extends TestCase
 {
     public function testCreateSucceed(): void
     {
+        $this->expectNotToPerformAssertions();
+
         new CacheResponseAttribute(cacheKey: 'test');
         new CacheResponseAttribute(cacheKeyFactory: TestCacheKeyFactory::class);
-
-        $this->assertTrue(true);
     }
 
     public function testCreateFailedWithoutArguments(): void

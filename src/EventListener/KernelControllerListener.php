@@ -29,6 +29,7 @@ readonly class KernelControllerListener implements EventSubscriberInterface
             return;
         }
 
+        /** @var array{object, string} $controllers */
         [$controller, $method] = $controllers;
 
         $this->resolve($controller, $method, $event);

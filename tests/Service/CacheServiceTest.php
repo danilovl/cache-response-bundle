@@ -37,7 +37,6 @@ class CacheServiceTest extends TestCase
 
         $result = $this->cacheService->getCacheKeys();
 
-        $this->assertIsArray($result);
         $this->assertEmpty($result);
     }
 
@@ -86,7 +85,6 @@ class CacheServiceTest extends TestCase
 
         $result = $this->cacheService->findSimilarCacheKeys('user_');
 
-        $this->assertIsArray($result);
         $this->assertCount(2, $result);
         $this->assertSame(['user_123', 'user_456'], $result);
     }

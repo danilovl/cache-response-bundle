@@ -90,7 +90,6 @@ class KernelControllerListenerTest extends TestCase
         $subscriber->onKernelController($event);
 
         $cache = $cacheItemPool->getItem($cacheKey);
-        /** @var null $response */
         $response = $cache->get();
 
         $this->assertNull($response);

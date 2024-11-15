@@ -25,7 +25,7 @@ class KernelResponseListener implements EventSubscriberInterface
             return;
         }
 
-        /** @var string $controllerAttribute */
+        /** @var string|array{?string, ?string}|null $controllerAttribute */
         $controllerAttribute = $event->getRequest()->attributes->get('_controller');
 
         $controller = null;
