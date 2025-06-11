@@ -83,6 +83,7 @@ readonly class CacheResponseAttribute
         }
 
         if ($this->env) {
+            /** @var string|null $appEnv */
             $appEnv = $request->server->get('APP_ENV');
             if ($appEnv) {
                 $cacheKey .= '.' . $appEnv;
