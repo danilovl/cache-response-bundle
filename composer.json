@@ -39,8 +39,8 @@
         "tests": "vendor/bin/phpunit tests",
         "phpstan": "phpstan analyse -c phpstan.neon src tests --no-progress",
         "phpstan-generate-baseline": "@php vendor/bin/phpstan analyse --level 9  --configuration phpstan.neon  src/ tests/ --generate-baseline",
-        "cs-fixer": "vendor/bin/php-cs-fixer fix --allow-risky=yes",
-        "cs-fixer-check": "vendor/bin/php-cs-fixer fix --dry-run --allow-risky=yes"
+        "cs-fixer": "PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --allow-risky=yes",
+        "cs-fixer-check": "PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --dry-run --allow-risky=yes"
     },
     "config": {
         "allow-plugins": {

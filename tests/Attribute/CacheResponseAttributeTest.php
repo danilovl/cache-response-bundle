@@ -95,7 +95,7 @@ class CacheResponseAttributeTest extends TestCase
         $request = new Request;
         $request->server->set('APP_ENV', 'test');
 
-        $expectedCacheKey = CacheResponseAttribute::CACHE_KEY_PREFIX . sha1($cacheKey) . '.' . 'test';
+        $expectedCacheKey = CacheResponseAttribute::CACHE_KEY_PREFIX . sha1($cacheKey) . '.test';
         $this->assertEquals(
             $expectedCacheKey,
             $cacheResponseAttribute->getCacheKeyForRequest($request)
