@@ -86,4 +86,19 @@ class CacheResponseAttributeTest extends TestCase
     {
         $this->assertFalse(CacheResponseAttribute::isCacheKeyContainsPrefix('test.cache_response.test.key'));
     }
+
+    public function testGetCacheKeyForRequestWithEnv(): void
+    {
+        $cacheKey = 'test.key';
+        $cacheResponseAttribute = new CacheResponseAttribute($cacheKey, env: true);
+
+        $request = new Request;
+        $request->server->set('APP_ENV', 'test');
+
+        $expectedCacheKey = CacheResponseAttribute::CACHE_KEY_PREFIX . sha1($cacheKey) . '.' . 'test';
+        $this->assertEquals(
+            $expectedCacheKey,
+            $cacheResponseAttribute->getCacheKeyForRequest($request)
+        );
+    }
 }

@@ -9,7 +9,7 @@ use DateInterval;
 use DateTimeInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-#[Attribute]
+#[Attribute(Attribute::TARGET_METHOD)]
 readonly class CacheResponseAttribute
 {
     public const string CACHE_KEY_PREFIX = 'danilovl.cache_response.';
@@ -25,7 +25,8 @@ readonly class CacheResponseAttribute
         public int|DateInterval|null $expiresAfter = null,
         public ?DateTimeInterface $expiresAt = null,
         public bool $cacheKeyWithQuery = false,
-        public bool $cacheKeyWithRequest = false
+        public bool $cacheKeyWithRequest = false,
+        public bool $env = false
     ) {
         if ($cacheKey === null && $cacheKeyFactory === null) {
             throw new CacheResponseInvalidArgumentException('CacheKey or CacheKeyFactory is required.');
@@ -62,7 +63,7 @@ readonly class CacheResponseAttribute
             throw new CacheResponseInvalidArgumentException('CacheKey is required when CacheKeyFactory is not set.');
         }
 
-        if (!$this->cacheKeyWithQuery && !$this->cacheKeyWithRequest) {
+        if (!$this->cacheKeyWithQuery && !$this->cacheKeyWithRequest && !$this->env) {
             return $this->cacheKey;
         }
 
@@ -78,6 +79,13 @@ readonly class CacheResponseAttribute
             $requestAll = $request->request->all();
             if (count($requestAll) > 0) {
                 $cacheKey .= '.' . sha1(serialize($requestAll));
+            }
+        }
+
+        if ($this->env) {
+            $appEnv = $request->server->get('APP_ENV');
+            if ($appEnv) {
+                $cacheKey .= '.' . $appEnv;
             }
         }
 

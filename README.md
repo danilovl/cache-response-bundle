@@ -62,7 +62,8 @@ Add attribute `CacheResponseAttribute` to controller method.
     cacheKey: 'index', 
     expiresAfter: 60, 
     cacheKeyWithQuery: true, 
-    cacheKeyWithRequest: true
+    cacheKeyWithRequest: true,
+    end: true
 )]
 public function index(Request $request): Response
 {
@@ -77,7 +78,8 @@ Or better solution if you have duplicate controller name and method name.
     cacheKey: __METHOD__, 
     expiresAfter: 60, 
     cacheKeyWithQuery: true, 
-    cacheKeyWithRequest: true
+    cacheKeyWithRequest: true,
+    end: true
 )]
 public function index(Request $request): Response
 {
