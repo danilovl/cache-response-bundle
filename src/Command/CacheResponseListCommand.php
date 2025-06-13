@@ -32,7 +32,21 @@ class CacheResponseListCommand extends Command
         $routes = $this->router->getRouteCollection()->all();
 
         $table = (new Table($output))
-            ->setHeaders(['Controller', 'Action', 'Cache info', 'Cache key factory', 'Expires after', 'Expires at', 'With query', 'Wth request']);
+            ->setHeaders([
+                'Controller',
+                'Action',
+                'Cache info',
+                'Factory',
+                'Expires after',
+                'Expires at',
+                'Use session',
+                'Use route',
+                'Use query',
+                'Use request',
+                'Use',
+                'Disable on query',
+                'Disable on request'
+            ]);
 
         foreach ($routes as $route) {
             /** @var string|null $controller */
@@ -59,9 +73,9 @@ class CacheResponseListCommand extends Command
             /** @var CacheResponseAttribute $attribute */
             $attribute = $attributes->newInstance();
 
-            if ($attribute->cacheKeyFactory !== null) {
+            if ($attribute->factory !== null) {
                 /** @var CacheKeyFactoryInterface $cacheFactory */
-                $cacheFactory = $this->container->get($attribute->cacheKeyFactory);
+                $cacheFactory = $this->container->get($attribute->factory);
                 $cacheKey = $cacheFactory->getCacheKey();
                 $originalCacheKey = $cacheKey;
             } else {
@@ -75,21 +89,28 @@ class CacheResponseListCommand extends Command
                 $controller,
                 $method,
                 'Original cache key:',
-                $attribute->cacheKeyFactory !== null ? 'yes' : 'no',
+                $attribute->factory !== null ? 'yes' : 'no',
                 $this->getFormattedExpiration($attribute->expiresAfter),
                 $this->getFormattedExpiration($attribute->expiresAt),
-                $attribute->cacheKeyWithQuery ? 'yes' : 'no',
-                $attribute->cacheKeyWithRequest ? 'yes' : 'no'
+                $attribute->useSession ? 'yes' : 'no',
+                $attribute->useRoute ? 'yes' : 'no',
+                $attribute->useQuery ? 'yes' : 'no',
+                $attribute->useRequest ? 'yes' : 'no',
+                $attribute->useEnv ? 'yes' : 'no',
+                $attribute->disableOnQuery ? 'yes' : 'no',
+                $attribute->disableOnRequest ? 'yes' : 'no'
             ]);
 
-            $table->addRow([null, null, $originalCacheKey, null, null, null, null, null]);
-            $table->addRow([null, null, null, null, null, null, null, null]);
-            $table->addRow([null, null, 'Attribute cache key:', null, null, null, null, null]);
-            $table->addRow([null, null, $cacheKey, null, null, null, null, null]);
-            $table->addRow([null, null, null, null, null, null, null, null]);
-            $table->addRow([null, null, 'Actually in cache:', null, null, null, null, null]);
-            $table->addRow([null, null, implode(PHP_EOL, $actuallyInCache), null, null, null, null, null]);
-            $table->addRow([null, null, null, null, null, null, null, null]);
+            $nulls = [null, null, null, null, null, null, null, null, null, null];
+
+            $table->addRow([null, null, $originalCacheKey, ...$nulls]);
+            $table->addRow([null, null, null, ...$nulls]);
+            $table->addRow([null, null, 'Attribute cache key:', ...$nulls]);
+            $table->addRow([null, null, $cacheKey, ...$nulls]);
+            $table->addRow([null, null, null, ...$nulls]);
+            $table->addRow([null, null, 'Actually in cache:', ...$nulls]);
+            $table->addRow([null, null, implode(PHP_EOL, $actuallyInCache), ...$nulls]);
+            $table->addRow([null, null, null, ...$nulls]);
         }
 
         $table->render();

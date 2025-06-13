@@ -16,11 +16,16 @@ readonly class KernelControllerListener implements EventSubscriberInterface
 {
     public function __construct(
         private CacheItemPoolInterface $cacheItemPool,
-        private ContainerInterface $container
+        private ContainerInterface $container,
+        private bool $enable = true
     ) {}
 
     public function onKernelController(ControllerEvent $event): void
     {
+        if (!$this->enable) {
+            return;
+        }
+
         if (!$event->isMainRequest()) {
             return;
         }
@@ -53,17 +58,36 @@ readonly class KernelControllerListener implements EventSubscriberInterface
 
     private function handleRequest(
         ControllerEvent $event,
-        CacheResponseAttribute $hashidsParamConverterAttribute
+        CacheResponseAttribute $cacheResponseAttribute
     ): void {
         $request = $event->getRequest();
         $request->attributes->set(CacheResponseAttribute::REQUEST_ATTRIBUTES_CACHE_USED, false);
+        $request->attributes->set(CacheResponseAttribute::REQUEST_ATTRIBUTES_CACHE_IGNORE, false);
 
-        if ($hashidsParamConverterAttribute->cacheKeyFactory !== null) {
+        if ($cacheResponseAttribute->disableOnQuery) {
+            $queryAll = $request->query->all();
+            if (count($queryAll) > 0) {
+                $request->attributes->set(CacheResponseAttribute::REQUEST_ATTRIBUTES_CACHE_IGNORE, true);
+
+                return;
+            }
+        }
+
+        if ($cacheResponseAttribute->disableOnRequest) {
+            $requestAll = $request->request->all();
+            if (count($requestAll) > 0) {
+                $request->attributes->set(CacheResponseAttribute::REQUEST_ATTRIBUTES_CACHE_IGNORE, true);
+
+                return;
+            }
+        }
+
+        if ($cacheResponseAttribute->factory !== null) {
             /** @var CacheKeyFactoryInterface $cacheFactory */
-            $cacheFactory = $this->container->get($hashidsParamConverterAttribute->cacheKeyFactory);
+            $cacheFactory = $this->container->get($cacheResponseAttribute->factory);
             $cacheKey = $cacheFactory->getCacheKey();
         } else {
-            $cacheKey = $hashidsParamConverterAttribute->getCacheKeyForRequest($request);
+            $cacheKey = $cacheResponseAttribute->getCacheKeyForRequest($request);
         }
 
         $cache = $this->cacheItemPool->getItem($cacheKey);

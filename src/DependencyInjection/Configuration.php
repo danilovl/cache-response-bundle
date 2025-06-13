@@ -16,6 +16,9 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->booleanNode('enable')
+                    ->defaultTrue()
+                ->end()
                 ->scalarNode('cache_service')
                     ->defaultNull()
                 ->end()

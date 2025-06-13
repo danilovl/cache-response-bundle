@@ -70,14 +70,19 @@ class KernelResponseListener implements EventSubscriberInterface
         CacheResponseAttribute $cacheResponseAttribute
     ): void {
         $request = $event->getRequest();
+        $isCacheIgnore = $request->attributes->get(CacheResponseAttribute::REQUEST_ATTRIBUTES_CACHE_IGNORE);
+        if ($isCacheIgnore) {
+            return;
+        }
+
         $isCacheUsed = $request->attributes->get(CacheResponseAttribute::REQUEST_ATTRIBUTES_CACHE_USED);
         if ($isCacheUsed) {
             return;
         }
 
-        if ($cacheResponseAttribute->cacheKeyFactory !== null) {
+        if ($cacheResponseAttribute->factory !== null) {
             /** @var CacheKeyFactoryInterface $cacheFactory */
-            $cacheFactory = $this->container->get($cacheResponseAttribute->cacheKeyFactory);
+            $cacheFactory = $this->container->get($cacheResponseAttribute->factory);
             $cacheKey = $cacheFactory->getCacheKey();
         } else {
             $cacheKey = $cacheResponseAttribute->getCacheKeyForRequest($request);

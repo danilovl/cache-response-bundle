@@ -13,35 +13,41 @@ use Symfony\Component\HttpFoundation\Request;
 readonly class CacheResponseAttribute
 {
     public const string CACHE_KEY_PREFIX = 'danilovl.cache_response.';
+
     public const string REQUEST_ATTRIBUTES_CACHE_USED = 'danilovl.cache_response_used';
+    public const string REQUEST_ATTRIBUTES_CACHE_IGNORE = 'danilovl.cache_response_ignore';
 
     public ?string $originalCacheKey;
 
-    public ?string $cacheKey;
+    public ?string $key;
 
     public function __construct(
-        ?string $cacheKey = null,
-        public ?string $cacheKeyFactory = null,
+        ?string $key = null,
+        public ?string $factory = null,
         public int|DateInterval|null $expiresAfter = null,
         public ?DateTimeInterface $expiresAt = null,
-        public bool $cacheKeyWithQuery = false,
-        public bool $cacheKeyWithRequest = false,
-        public bool $env = false
+        public bool $useSession = false,
+        public bool $useRoute = false,
+        public bool $useQuery = false,
+        public bool $useRequest = false,
+        public bool $useEnv = false,
+        public bool $disableOnQuery = false,
+        public bool $disableOnRequest = false,
     ) {
-        if ($cacheKey === null && $cacheKeyFactory === null) {
+        if ($key === null && $factory === null) {
             throw new CacheResponseInvalidArgumentException('CacheKey or CacheKeyFactory is required.');
         }
 
-        if ($cacheKey !== null) {
-            $this->originalCacheKey = $cacheKey;
-            $this->cacheKey = self::CACHE_KEY_PREFIX . sha1($cacheKey);
+        if ($key !== null) {
+            $this->originalCacheKey = $key;
+            $this->key = self::CACHE_KEY_PREFIX . self::hash($key);
         } else {
             $this->originalCacheKey = null;
-            $this->cacheKey = null;
+            $this->key = null;
         }
 
-        if ($cacheKeyFactory !== null) {
-            $interfaces = class_implements($cacheKeyFactory);
+        if ($factory !== null) {
+            $interfaces = class_implements($factory);
             if ($interfaces !== false && !in_array(CacheKeyFactoryInterface::class, $interfaces)) {
                 throw new CacheResponseInvalidArgumentException('Class CacheKeyFactory is not implemented CacheKeyFactoryInterface.');
             }
@@ -50,47 +56,70 @@ readonly class CacheResponseAttribute
 
     public function getCacheKeyNotNull(): string
     {
-        if ($this->cacheKey === null) {
+        if ($this->key === null) {
             throw new CacheResponseInvalidArgumentException('CacheKey can not be null.');
         }
 
-        return $this->cacheKey;
+        return $this->key;
     }
 
     public function getCacheKeyForRequest(Request $request): string
     {
-        if ($this->cacheKey === null) {
+        if ($this->key === null) {
             throw new CacheResponseInvalidArgumentException('CacheKey is required when CacheKeyFactory is not set.');
         }
 
-        if (!$this->cacheKeyWithQuery && !$this->cacheKeyWithRequest && !$this->env) {
-            return $this->cacheKey;
+        $data = [];
+
+        if ($this->useSession) {
+            $data['session'] = $request->getSession()->getId();
         }
 
-        $cacheKey = $this->cacheKey;
-        if ($this->cacheKeyWithQuery) {
+        if ($this->useRoute) {
+            $route = $request->attributes->getString('_route');
+            if ($route === '') {
+                throw new CacheResponseInvalidArgumentException('Route _route can not be empty when useRoute is true.');
+            }
+
+            /** @var array $routeParams */
+            $routeParams = $request->attributes->get('_route_params', []);
+            $data['route'] = $route;
+
+            if (count($routeParams) > 0) {
+                $data['routeParams'] = $routeParams;
+            }
+        }
+
+        if ($this->useQuery) {
             $queryAll = $request->query->all();
             if (count($queryAll) > 0) {
-                $cacheKey .= '.' . sha1(serialize($queryAll));
+                $data['query'] = $queryAll;
             }
         }
 
-        if ($this->cacheKeyWithRequest) {
+        if ($this->useRequest) {
             $requestAll = $request->request->all();
             if (count($requestAll) > 0) {
-                $cacheKey .= '.' . sha1(serialize($requestAll));
+                $data['request'] = $requestAll;
             }
         }
 
-        if ($this->env) {
-            /** @var string|null $appEnv */
+        if ($this->useEnv) {
             $appEnv = $request->server->get('APP_ENV');
-            if ($appEnv) {
-                $cacheKey .= '.' . $appEnv;
+            if (empty($appEnv)) {
+                throw new CacheResponseInvalidArgumentException('APP_ENV can not be empty when useEnv is true.');
             }
+
+            $data['env'] = $appEnv;
         }
 
-        return $cacheKey;
+        if (count($data) === 0) {
+            return $this->key;
+        }
+
+        $dataHash = self::hash(serialize($data));
+
+        return $this->key . '.' . $dataHash;
     }
 
     public static function getCacheKeyWithPrefix(string $cacheKey): string
@@ -105,5 +134,10 @@ readonly class CacheResponseAttribute
     public static function isCacheKeyContainsPrefix(string $cacheKey): bool
     {
         return str_contains($cacheKey, self::CACHE_KEY_PREFIX);
+    }
+
+    public static function hash(string $data): string
+    {
+        return hash('xxh3', $data);
     }
 }

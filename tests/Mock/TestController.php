@@ -7,21 +7,33 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TestController
 {
-    #[CacheResponseAttribute(cacheKey: 'index', expiresAfter: 60, cacheKeyWithQuery: true)]
+    #[CacheResponseAttribute(key: 'index', expiresAfter: 60, useQuery: true)]
     public function index(): Response
     {
         return new Response('content');
     }
 
-    #[CacheResponseAttribute(cacheKeyFactory: TestCacheKeyFactory::class)]
+    #[CacheResponseAttribute(factory: TestCacheKeyFactory::class)]
     public function cacheKeyFactory(): Response
     {
         return new Response('CacheKeyFactory content');
     }
 
-    #[CacheResponseAttribute(cacheKeyFactory: TestCacheKeyFactoryException::class)]
+    #[CacheResponseAttribute(factory: TestCacheKeyFactoryException::class)]
     public function cacheKeyFactoryException(): Response
     {
         return new Response('CacheKeyFactory content');
+    }
+
+    #[CacheResponseAttribute(key: 'disableOnQuery', disableOnQuery: true)]
+    public function disableOnQuery(): Response
+    {
+        return new Response('DisableOnQuery content');
+    }
+
+    #[CacheResponseAttribute(key: 'disableOnRequest', disableOnRequest: true)]
+    public function disableOnRequest(): Response
+    {
+        return new Response('DisableOnRequest content');
     }
 }

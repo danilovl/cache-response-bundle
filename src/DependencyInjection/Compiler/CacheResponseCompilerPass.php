@@ -27,7 +27,16 @@ class CacheResponseCompilerPass implements CompilerPassInterface
         $configuration = new Configuration;
         $config = $this->processConfiguration($configuration, $configs);
 
+        $this->enable($container, $config);
         $this->injectCacheService($container, $config);
+    }
+
+    private function enable(ContainerBuilder $container, array $config): void
+    {
+        $enable = $config['enable'];
+
+        $definition = $container->getDefinition(KernelControllerListener::class);
+        $definition->setArgument('$enable', $enable);
     }
 
     private function injectCacheService(ContainerBuilder $container, array $config): void

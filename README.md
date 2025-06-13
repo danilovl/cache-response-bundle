@@ -50,8 +50,28 @@ You can define custom cache service witch implement `CacheItemPoolInterface`.
 # config/packages/danilovl_cache_response.yaml
 
 danilovl_cache_response:
+  enable: true
   service: You service name
 ```
+
+`CacheResponseAttribute` attributes:
+
+```
+| Parameter         | Type                   | Default | Require         | Description                                                             |
+| ----------------- | ---------------------- | ------- | --------------- | ----------------------------------------------------------------------- |
+| $key              | ?string                | null    |  yes || factory | A custom cache key. If null, a key will be generated automatically.     |
+| $factory          | ?string                | null    |  yes || key     | The class of the factory used to generate the value.                    |
+| $expiresAfter     | int|DateInterval|null  | null    |  no             | Time after which the value expires. Can be seconds or a DateInterval.   |
+| $expiresAt        | ?DateTimeInterface     | null    |  no             | Exact expiration time for the value.                                    |
+| $useSession       | bool                   | false   |  no             | Whether to include session data in the cache key generation.            |
+| $useRoute         | bool                   | false   |  no             | Whether to include the current route in the cache key.                  |
+| $useQuery         | bool                   | false   |  no             | Whether to include query parameters in the cache key.                   |
+| $useRequest       | bool                   | false   |  no             | Whether to include full request data in the cache key.                  |
+| $useEnv           | bool                   | false   |  no             | Whether to include environment variables in the cache key.              |
+| $disableOnQuery   | bool                   | false   |  no             | Disable cache entirely if GET (query) parameters are present.           |
+| $disableOnRequest | bool                   | false   |  no             | Disable cache entirely if POST (request body) parameters are present.   |
+|--------------------------------------------------------------------------------------------------------------------------------------------------|
+``` 
 
 #### 2.1 Controller
 
@@ -59,11 +79,13 @@ Add attribute `CacheResponseAttribute` to controller method.
 
 ```php
 #[CacheResponseAttribute(
-    cacheKey: 'index', 
+    key: 'index', 
     expiresAfter: 60, 
-    cacheKeyWithQuery: true, 
-    cacheKeyWithRequest: true,
-    end: true
+    useSession: true, 
+    useRoute: true, 
+    useQuery: true, 
+    useRequest: true,
+    useEnv: true
 )]
 public function index(Request $request): Response
 {
@@ -75,11 +97,11 @@ Or better solution if you have duplicate controller name and method name.
 
 ```php
 #[CacheResponseAttribute(
-    cacheKey: __METHOD__, 
+    key: __METHOD__, 
     expiresAfter: 60, 
-    cacheKeyWithQuery: true, 
-    cacheKeyWithRequest: true,
-    end: true
+    useQuery: true, 
+    useRequest: true,
+    useEnv: true
 )]
 public function index(Request $request): Response
 {
@@ -90,7 +112,7 @@ public function index(Request $request): Response
 Use custom factory service for create cache key. Must implements interface `CacheKeyFactoryInterface`.
 
 ```php
-#[CacheResponseAttribute(cacheKeyFactory: CachKeyFactoryClass::class)]
+#[CacheResponseAttribute(factory: CachKeyFactoryClass::class)]
 public function index(Request $request): Response
 {
     return new Response('content');
@@ -131,8 +153,8 @@ php bin/console danilovl:cache-response:clear --similarCacheKey=8414b2ff0
 ```
 
 ```php
-0 => "danilovl.cache_response.8414b2ff0a6fafcddc0f42d6d5a5b90similar"
-1 => "danilovl.cache_response.8414b2ff08997b2bd029eaab1a04598similar"
+0 => "danilovl.cache_response.5f9cf7121290f93c"
+1 => "danilovl.cache_response.a202b43aa495f0f3"
 ```
 
 ```bash
