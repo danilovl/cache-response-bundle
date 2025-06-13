@@ -43,7 +43,7 @@ class CacheResponseListCommand extends Command
                 'Use route',
                 'Use query',
                 'Use request',
-                'Use',
+                'Use env',
                 'Disable on query',
                 'Disable on request'
             ]);
