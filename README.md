@@ -64,7 +64,7 @@ danilovl_cache_response:
 | ----------------- | ---------------------- | ------- | --------------- | ----------------------------------------------------------------------- |
 | $key              | ?string                | null    |  yes || factory | A custom cache key. If null, a key will be generated automatically.     |
 | $factory          | ?string                | null    |  yes || key     | The class of the factory used to generate the value.                    |
-| $cacheAdapter     | ?string                | null    |  no             | The class of the cache adapter.                    |
+| $cacheAdapter     | ?string                | null    |  no             | The class of the cache adapter.                                         |
 | $expiresAfter     | int|DateInterval|null  | null    |  no             | Time after which the value expires. Can be seconds or a DateInterval.   |
 | $expiresAt        | ?DateTimeInterface     | null    |  no             | Exact expiration time for the value.                                    |
 | $useSession       | bool                   | false   |  no             | Whether to include session data in the cache key generation.            |
