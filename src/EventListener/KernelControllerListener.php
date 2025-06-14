@@ -90,7 +90,13 @@ readonly class KernelControllerListener implements EventSubscriberInterface
             $cacheKey = $cacheResponseAttribute->getCacheKeyForRequest($request);
         }
 
-        $cache = $this->cacheItemPool->getItem($cacheKey);
+        $cashItemPool = $this->cacheItemPool;
+        if ($cacheResponseAttribute->cacheAdapter !== null) {
+            /** @var CacheItemPoolInterface $cashItemPool */
+            $cashItemPool = $this->container->get($cacheResponseAttribute->cacheAdapter);
+        }
+
+        $cache = $cashItemPool->getItem($cacheKey);
         if (!$cache->isHit()) {
             return;
         }

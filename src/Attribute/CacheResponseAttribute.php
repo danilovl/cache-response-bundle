@@ -7,6 +7,7 @@ use Danilovl\CacheResponseBundle\Exception\CacheResponseInvalidArgumentException
 use Danilovl\CacheResponseBundle\Interfaces\CacheKeyFactoryInterface;
 use DateInterval;
 use DateTimeInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 #[Attribute(Attribute::TARGET_METHOD)]
@@ -24,6 +25,7 @@ readonly class CacheResponseAttribute
     public function __construct(
         ?string $key = null,
         public ?string $factory = null,
+        public ?string $cacheAdapter = null,
         public int|DateInterval|null $expiresAfter = null,
         public ?DateTimeInterface $expiresAt = null,
         public bool $useSession = false,
@@ -50,6 +52,21 @@ readonly class CacheResponseAttribute
             $interfaces = class_implements($factory);
             if ($interfaces !== false && !in_array(CacheKeyFactoryInterface::class, $interfaces)) {
                 throw new CacheResponseInvalidArgumentException('Class CacheKeyFactory is not implemented CacheKeyFactoryInterface.');
+            }
+        }
+
+        if ($cacheAdapter !== null) {
+            $implements = class_implements($cacheAdapter);
+            $implementCacheItemPoolInterface = $implements[CacheItemPoolInterface::class] ?? false;
+
+            if (!$implementCacheItemPoolInterface) {
+                $message = sprintf(
+                    'The cache adapter "%s" must implement "%s".',
+                    $cacheAdapter,
+                    CacheItemPoolInterface::class
+                );
+
+                throw new CacheResponseInvalidArgumentException($message);
             }
         }
     }

@@ -19,7 +19,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('enable')
                     ->defaultTrue()
                 ->end()
-                ->scalarNode('cache_service')
+                ->scalarNode('cache_adapter')
                     ->defaultNull()
                 ->end()
             ->end();

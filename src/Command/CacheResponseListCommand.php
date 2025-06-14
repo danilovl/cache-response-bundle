@@ -37,6 +37,7 @@ class CacheResponseListCommand extends Command
                 'Action',
                 'Cache info',
                 'Factory',
+                'Adapter',
                 'Expires after',
                 'Expires at',
                 'Use session',
@@ -89,7 +90,8 @@ class CacheResponseListCommand extends Command
                 $controller,
                 $method,
                 'Original cache key:',
-                $attribute->factory !== null ? 'yes' : 'no',
+                $attribute->factory !== null ? $attribute->factory : 'no',
+                $attribute->cacheAdapter !== null ? $attribute->cacheAdapter : 'no',
                 $this->getFormattedExpiration($attribute->expiresAfter),
                 $this->getFormattedExpiration($attribute->expiresAt),
                 $attribute->useSession ? 'yes' : 'no',
@@ -101,7 +103,7 @@ class CacheResponseListCommand extends Command
                 $attribute->disableOnRequest ? 'yes' : 'no'
             ]);
 
-            $nulls = [null, null, null, null, null, null, null, null, null, null];
+            $nulls = [null, null, null, null, null, null, null, null, null, null, null];
 
             $table->addRow([null, null, $originalCacheKey, ...$nulls]);
             $table->addRow([null, null, null, ...$nulls]);

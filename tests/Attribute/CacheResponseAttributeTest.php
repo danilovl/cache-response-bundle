@@ -4,10 +4,13 @@ namespace Danilovl\CacheResponseBundle\Tests\Attribute;
 
 use Danilovl\CacheResponseBundle\Attribute\CacheResponseAttribute;
 use Danilovl\CacheResponseBundle\Exception\CacheResponseInvalidArgumentException;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Danilovl\CacheResponseBundle\Tests\Mock\{
     TestController,
-    TestCacheKeyFactory
+    TestCacheKeyFactory,
+    TestInvalidCacheAdapter
 };
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -306,5 +309,24 @@ class CacheResponseAttributeTest extends TestCase
 
         $this->assertTrue($cacheResponseAttribute->disableOnQuery);
         $this->assertTrue($cacheResponseAttribute->disableOnRequest);
+    }
+
+    public function testCreateWithValidCacheAdapter(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        new CacheResponseAttribute(key: 'test', cacheAdapter: ArrayAdapter::class);
+    }
+
+    public function testCreateWithInvalidCacheAdapter(): void
+    {
+        $this->expectException(CacheResponseInvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The cache adapter "%s" must implement "%s".',
+            TestInvalidCacheAdapter::class,
+            CacheItemPoolInterface::class
+        ));
+
+        new CacheResponseAttribute(key: 'test', cacheAdapter: TestInvalidCacheAdapter::class);
     }
 }

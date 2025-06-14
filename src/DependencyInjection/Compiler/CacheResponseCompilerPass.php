@@ -41,12 +41,12 @@ class CacheResponseCompilerPass implements CompilerPassInterface
 
     private function injectCacheService(ContainerBuilder $container, array $config): void
     {
-        $cacheService = $config['cache_service'] ?? null;
-        if ($cacheService === null) {
+        $cacheAdapter = $config['cache_adapter'] ?? null;
+        if ($cacheAdapter === null) {
             return;
         }
 
-        $cacheServiceContainer = $container->getDefinition($cacheService);
+        $cacheServiceContainer = $container->getDefinition($cacheAdapter);
         /** @var string $class */
         $class = $cacheServiceContainer->getClass();
         $implements = class_implements($class, false);
@@ -54,8 +54,8 @@ class CacheResponseCompilerPass implements CompilerPassInterface
 
         if (!$implementCacheItemPoolInterface) {
             $message = sprintf(
-                'The service "%s" must implement "%s".',
-                $cacheService,
+                'The cache adapter "%s" must implement "%s".',
+                $cacheAdapter,
                 CacheItemPoolInterface::class
             );
 

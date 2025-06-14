@@ -88,7 +88,13 @@ class KernelResponseListener implements EventSubscriberInterface
             $cacheKey = $cacheResponseAttribute->getCacheKeyForRequest($request);
         }
 
-        $cache = $this->cacheItemPool->getItem($cacheKey);
+        $cashItemPool = $this->cacheItemPool;
+        if ($cacheResponseAttribute->cacheAdapter !== null) {
+            /** @var CacheItemPoolInterface $cashItemPool */
+            $cashItemPool = $this->container->get($cacheResponseAttribute->cacheAdapter);
+        }
+
+        $cache = $cashItemPool->getItem($cacheKey);
         if ($cache->isHit()) {
             return;
         }
@@ -103,9 +109,9 @@ class KernelResponseListener implements EventSubscriberInterface
             $cache->expiresAt($cacheResponseAttribute->expiresAt);
         }
 
-        $this->cacheItemPool->save($cache);
+        $cashItemPool->save($cache);
 
-        $attributeCacheKeys = $this->cacheItemPool->getItem(CacheService::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
+        $attributeCacheKeys = $cashItemPool->getItem(CacheService::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
         $keys = [];
 
         if ($attributeCacheKeys->isHit()) {
@@ -118,7 +124,7 @@ class KernelResponseListener implements EventSubscriberInterface
         }
 
         $attributeCacheKeys->set($keys);
-        $this->cacheItemPool->save($attributeCacheKeys);
+        $cashItemPool->save($attributeCacheKeys);
     }
 
     public static function getSubscribedEvents(): array

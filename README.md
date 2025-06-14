@@ -46,12 +46,15 @@ return [
 
 You can define custom cache service witch implement `CacheItemPoolInterface`.
 
+Default cache service name for all attributes. You can leave it empty.
+The DI sets the default cache service to CacheItemPoolInterface, which is defined in your application.
+
 ```yaml
 # config/packages/danilovl_cache_response.yaml
 
 danilovl_cache_response:
-  enable: true
-  service: You service name
+  enable: true/false
+  cache_adapter: 'Class::class'
 ```
 
 `CacheResponseAttribute` attributes:
@@ -61,6 +64,7 @@ danilovl_cache_response:
 | ----------------- | ---------------------- | ------- | --------------- | ----------------------------------------------------------------------- |
 | $key              | ?string                | null    |  yes || factory | A custom cache key. If null, a key will be generated automatically.     |
 | $factory          | ?string                | null    |  yes || key     | The class of the factory used to generate the value.                    |
+| $cacheAdapter     | ?string                | null    |  no             | The class of the cache adapter.                    |
 | $expiresAfter     | int|DateInterval|null  | null    |  no             | Time after which the value expires. Can be seconds or a DateInterval.   |
 | $expiresAt        | ?DateTimeInterface     | null    |  no             | Exact expiration time for the value.                                    |
 | $useSession       | bool                   | false   |  no             | Whether to include session data in the cache key generation.            |
