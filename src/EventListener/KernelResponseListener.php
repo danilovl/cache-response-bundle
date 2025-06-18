@@ -14,6 +14,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class KernelResponseListener implements EventSubscriberInterface
 {
+    public static int $priority = 0;
+
     public function __construct(
         private readonly CacheItemPoolInterface $cacheItemPool,
         private readonly ContainerInterface $container
@@ -130,7 +132,7 @@ class KernelResponseListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::RESPONSE => 'onKernelResponse'
+            KernelEvents::RESPONSE => [['onKernelResponse', self::$priority]]
         ];
     }
 }

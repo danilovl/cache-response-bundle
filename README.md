@@ -55,6 +55,8 @@ The DI sets the default cache service to CacheItemPoolInterface, which is define
 danilovl_cache_response:
   enable: true/false
   cache_adapter: 'Class::class'
+  kernel_controller_priority: 0
+  kernel_response_priority: 0
 ```
 
 `CacheResponseAttribute` attributes:

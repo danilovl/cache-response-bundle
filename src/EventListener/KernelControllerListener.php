@@ -12,12 +12,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-readonly class KernelControllerListener implements EventSubscriberInterface
+class KernelControllerListener implements EventSubscriberInterface
 {
+    public static int $priority = 0;
+
     public function __construct(
-        private CacheItemPoolInterface $cacheItemPool,
-        private ContainerInterface $container,
-        private bool $enable = true
+        private readonly CacheItemPoolInterface $cacheItemPool,
+        private readonly ContainerInterface $container,
+        private readonly bool $enable = true
     ) {}
 
     public function onKernelController(ControllerEvent $event): void
@@ -113,7 +115,7 @@ readonly class KernelControllerListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::CONTROLLER => 'onKernelController'
+            KernelEvents::CONTROLLER => [['onKernelController', self::$priority]]
         ];
     }
 }

@@ -22,6 +22,14 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('cache_adapter')
                     ->defaultNull()
                 ->end()
+                ->scalarNode('kernel_controller_priority')
+                    ->defaultNull()
+                    ->info('Priority for the controller listener')
+                ->end()
+                ->scalarNode('kernel_response_priority')
+                    ->defaultNull()
+                    ->info('Priority for the response listener')
+                ->end()
             ->end();
 
         return $treeBuilder;
