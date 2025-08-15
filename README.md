@@ -7,7 +7,7 @@
 
 ## About ##
 
-Symfony bundle provides simple cache response.
+This Symfony bundle provides simple response caching.
 
 Before:
 
@@ -24,13 +24,13 @@ After:
 
 ### 1. Installation
 
-Install `danilovl/cache-response-bundle` package by Composer:
+Install the `danilovl/cache-response-bundle` package with Composer:
 
 ``` bash
 composer require danilovl/cache-response-bundle
 ```
 
-Add the `CacheResponseBundle` to your application's bundles if does not add automatically:
+Add the `CacheResponseBundle` to your application's bundles if it is not added automatically:
 
 ``` php
 <?php
@@ -44,10 +44,9 @@ return [
 
 ### 2. Usage
 
-You can define custom cache service witch implement `CacheItemPoolInterface`.
+You can define a custom cache service which implements `CacheItemPoolInterface`.
 
-Default cache service name for all attributes. You can leave it empty.
-The DI sets the default cache service to CacheItemPoolInterface, which is defined in your application.
+Default cache service used for all attributes. You may leave it empty; the DI container will use the default service for `CacheItemPoolInterface` defined in your application.
 
 ```yaml
 # config/packages/danilovl_cache_response.yaml
@@ -59,10 +58,10 @@ danilovl_cache_response:
   kernel_response_priority: 0
 ```
 
-`CacheResponseAttribute` attributes:
+`CacheResponseAttribute` options:
 
 ```
-| Parameter         | Type                   | Default | Require         | Description                                                             |
+| Parameter         | Type                   | Default | Required        | Description                                                             |
 | ----------------- | ---------------------- | ------- | --------------- | ----------------------------------------------------------------------- |
 | $key              | ?string                | null    |  yes || factory | A custom cache key. If null, a key will be generated automatically.     |
 | $factory          | ?string                | null    |  yes || key     | The class of the factory used to generate the value.                    |
@@ -81,7 +80,7 @@ danilovl_cache_response:
 
 #### 2.1 Controller
 
-Add attribute `CacheResponseAttribute` to controller method.
+Add the `CacheResponseAttribute` to a controller method.
 
 ```php
 #[CacheResponseAttribute(
@@ -99,7 +98,7 @@ public function index(Request $request): Response
 }
 ```
 
-Or better solution if you have duplicate controller name and method name.
+Or, a better solution if you have duplicate controller and method names.
 
 ```php
 #[CacheResponseAttribute(
@@ -115,10 +114,10 @@ public function index(Request $request): Response
 }
 ```
 
-Use custom factory service for create cache key. Must implements interface `CacheKeyFactoryInterface`.
+Use a custom factory service to create the cache key. It must implement the `CacheKeyFactoryInterface`.
 
 ```php
-#[CacheResponseAttribute(factory: CachKeyFactoryClass::class)]
+#[CacheResponseAttribute(factory: CacheKeyFactoryClass::class)]
 public function index(Request $request): Response
 {
     return new Response('content');
@@ -127,7 +126,7 @@ public function index(Request $request): Response
 
 #### 2.2 Command
 
-Show all used `CacheResponseAttribute` cache key names.
+List all `CacheResponseAttribute` cache keys.
 
 ```bash
 php bin/console danilovl:cache-response:list 
@@ -135,19 +134,19 @@ php bin/console danilovl:cache-response:list
 
 ![Alt text](/.github/readme/console_command_list.png?raw=true "Console command list")
 
-Clear all `CacheResponseAttribute` cache.
+Clear all `CacheResponseAttribute` caches.
 
 ```bash
 php bin/console danilovl:cache-response:clear --all=true
 ```
 
-Clear only specific `CacheResponseAttribute` cache key name.
+Clear only a specific `CacheResponseAttribute` cache key.
 
 ```bash
 php bin/console danilovl:cache-response:clear --cacheKey=index
 ```
 
-Clear all similar `CacheResponseAttribute` cache key name.
+Clear all caches with similar `CacheResponseAttribute` cache key names.
 
 ```php
 0 => "danilovl.cache_response.8414b2ff0a6fafcddc0f42d6d5a5b908d34925c3"
@@ -167,15 +166,15 @@ php bin/console danilovl:cache-response:clear --similarCacheKey=8414b2ff0
 php bin/console danilovl:cache-response:clear --cacheKey=similar
 ```
 
-#### 2.3 EventSubscriber
+#### 2.3 Event Subscriber
 
-Clear all cache.
+Clear all caches.
 
 ```php
 $this->eventDispatcher->dispatch(new ClearCacheResponseAllEvent);
 ```
 
-Clear only specific cache key.
+Clear only a specific cache key.
 
 ```php
 $this->eventDispatcher->dispatch(new ClearCacheResponseKeyEvent('cache_key'));

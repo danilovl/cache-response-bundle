@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\{
 
 class KernelResponseListenerTest extends TestCase
 {
-    #[DataProvider('dataControllerMethod')]
+    #[DataProvider('provideOnKernelResponseCreateCacheCases')]
     public function testOnKernelResponseCreateCache(string $method): void
     {
         $controllerResponse = (new TestController)->{$method}();
@@ -90,7 +90,7 @@ class KernelResponseListenerTest extends TestCase
         $subscriber->onKernelResponse($event);
     }
 
-    public static function dataControllerMethod(): Generator
+    public static function provideOnKernelResponseCreateCacheCases(): Generator
     {
         yield ['index'];
         yield ['cacheKeyFactory'];
