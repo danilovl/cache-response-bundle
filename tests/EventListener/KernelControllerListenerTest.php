@@ -32,7 +32,7 @@ class KernelControllerListenerTest extends TestCase
         $callable = [new TestController, $method];
 
         $event = new ControllerEvent(
-            $this->createMock(KernelInterface::class),
+            $this->createStub(KernelInterface::class),
             $callable,
             new Request,
             HttpKernelInterface::MAIN_REQUEST
@@ -72,7 +72,7 @@ class KernelControllerListenerTest extends TestCase
         $callable = [new TestController, $method];
 
         $event = new ControllerEvent(
-            $this->createMock(KernelInterface::class),
+            $this->createStub(KernelInterface::class),
             $callable,
             new Request,
             HttpKernelInterface::MAIN_REQUEST
@@ -107,7 +107,7 @@ class KernelControllerListenerTest extends TestCase
         $callable = [new TestController, $method];
 
         $event = new ControllerEvent(
-            $this->createMock(KernelInterface::class),
+            $this->createStub(KernelInterface::class),
             $callable,
             new Request,
             HttpKernelInterface::MAIN_REQUEST
@@ -131,7 +131,7 @@ class KernelControllerListenerTest extends TestCase
         $request = new Request(query: ['param' => 'value']);
 
         $event = new ControllerEvent(
-            $this->createMock(KernelInterface::class),
+            $this->createStub(KernelInterface::class),
             $callable,
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -158,7 +158,7 @@ class KernelControllerListenerTest extends TestCase
         $request = new Request(request: ['param' => 'value']);
 
         $event = new ControllerEvent(
-            $this->createMock(KernelInterface::class),
+            $this->createStub(KernelInterface::class),
             $callable,
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -185,7 +185,7 @@ class KernelControllerListenerTest extends TestCase
         $request = new Request;
 
         $event = new ControllerEvent(
-            $this->createMock(KernelInterface::class),
+            $this->createStub(KernelInterface::class),
             $callable,
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -212,7 +212,7 @@ class KernelControllerListenerTest extends TestCase
         $request = new Request;
 
         $event = new ControllerEvent(
-            $this->createMock(KernelInterface::class),
+            $this->createStub(KernelInterface::class),
             $callable,
             $request,
             HttpKernelInterface::MAIN_REQUEST

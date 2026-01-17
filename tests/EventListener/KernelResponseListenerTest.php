@@ -32,7 +32,7 @@ class KernelResponseListenerTest extends TestCase
         $controllerResponse = (new TestController)->{$method}();
 
         $event = new ResponseEvent(
-            $this->createMock(KernelInterface::class),
+            $this->createStub(KernelInterface::class),
             new Request(
                 attributes: ['_controller' => TestController::class . '::' . $method],
             ),
@@ -72,7 +72,7 @@ class KernelResponseListenerTest extends TestCase
         $controllerResponse = (new TestController)->cacheKeyFactoryException();
 
         $event = new ResponseEvent(
-            $this->createMock(KernelInterface::class),
+            $this->createStub(KernelInterface::class),
             new Request(
                 attributes: ['_controller' => TestController::class . '::cacheKeyFactoryException'],
             ),

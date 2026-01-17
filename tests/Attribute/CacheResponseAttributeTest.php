@@ -244,7 +244,7 @@ class CacheResponseAttributeTest extends TestCase
         );
 
         $sessionId = 'test_session_id';
-        $session = $this->createMock(SessionInterface::class);
+        $session = $this->createStub(SessionInterface::class);
         $session->method('getId')->willReturn($sessionId);
 
         $request = new Request(
