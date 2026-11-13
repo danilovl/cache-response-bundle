@@ -150,7 +150,7 @@ readonly class CacheResponseAttribute
 
     public static function isCacheKeyContainsPrefix(string $cacheKey): bool
     {
-        return str_contains($cacheKey, self::CACHE_KEY_PREFIX);
+        return str_starts_with($cacheKey, self::CACHE_KEY_PREFIX);
     }
 
     public static function hash(string $data): string

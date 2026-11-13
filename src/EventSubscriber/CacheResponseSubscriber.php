@@ -19,7 +19,24 @@ readonly class CacheResponseSubscriber implements EventSubscriberInterface
 
     public function onClearCacheKey(ClearCacheResponseKeyEvent $event): void
     {
-        $this->cacheItemPool->deleteItem($event->key);
+        $similarCacheKeys = $this->cacheService->findSimilarCacheKeys($event->key);
+        $deleteCacheKeys = [$event->key, ...$similarCacheKeys];
+        $deleteCacheKeys = array_unique($deleteCacheKeys);
+
+        $this->cacheItemPool->deleteItems($deleteCacheKeys);
+
+        $attributeCacheKeysItem = $this->cacheItemPool->getItem(CacheService::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
+        if (!$attributeCacheKeysItem->isHit()) {
+            return;
+        }
+
+        /** @var string[] $cacheKeys */
+        $cacheKeys = $attributeCacheKeysItem->get() ?? [];
+        $newCacheKeys = array_diff($cacheKeys, $deleteCacheKeys);
+        $newCacheKeys = array_values($newCacheKeys);
+
+        $attributeCacheKeysItem->set($newCacheKeys);
+        $this->cacheItemPool->save($attributeCacheKeysItem);
     }
 
     public function onClearCacheAll(): void

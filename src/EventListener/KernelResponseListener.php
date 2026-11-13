@@ -9,6 +9,12 @@ use Psr\Cache\CacheItemPoolInterface;
 use ReflectionClass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\{
+    Request,
+    Response,
+    StreamedResponse,
+    BinaryFileResponse
+};
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -18,12 +24,13 @@ class KernelResponseListener implements EventSubscriberInterface
 
     public function __construct(
         private readonly CacheItemPoolInterface $cacheItemPool,
-        private readonly ContainerInterface $container
+        private readonly ContainerInterface $container,
+        private readonly bool $enable = true
     ) {}
 
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$event->isMainRequest()) {
+        if (!$this->enable || !$event->isMainRequest()) {
             return;
         }
 
@@ -72,6 +79,11 @@ class KernelResponseListener implements EventSubscriberInterface
         CacheResponseAttribute $cacheResponseAttribute
     ): void {
         $request = $event->getRequest();
+        $response = $event->getResponse();
+        if (!$this->isCacheable($request, $response)) {
+            return;
+        }
+
         $isCacheIgnore = $request->attributes->get(CacheResponseAttribute::REQUEST_ATTRIBUTES_CACHE_IGNORE);
         if ($isCacheIgnore) {
             return;
@@ -101,7 +113,7 @@ class KernelResponseListener implements EventSubscriberInterface
             return;
         }
 
-        $cache->set($event->getResponse());
+        $cache->set($this->createCacheableResponse($response));
 
         if ($cacheResponseAttribute->expiresAfter) {
             $cache->expiresAfter($cacheResponseAttribute->expiresAfter);
@@ -127,6 +139,39 @@ class KernelResponseListener implements EventSubscriberInterface
 
         $attributeCacheKeys->set($keys);
         $cashItemPool->save($attributeCacheKeys);
+    }
+
+    private function isCacheable(Request $request, Response $response): bool
+    {
+        if (!$request->isMethodCacheable()) {
+            return false;
+        }
+
+        if ($response->getStatusCode() !== Response::HTTP_OK) {
+            return false;
+        }
+
+        if ($response instanceof StreamedResponse || $response instanceof BinaryFileResponse) {
+            return false;
+        }
+
+        return !$response->headers->hasCacheControlDirective('no-store');
+    }
+
+    private function createCacheableResponse(Response $response): Response
+    {
+        $cacheableResponse = clone $response;
+        $cookies = $cacheableResponse->headers->getCookies();
+
+        foreach ($cookies as $cookie) {
+            $cacheableResponse->headers->removeCookie(
+                $cookie->getName(),
+                $cookie->getPath(),
+                $cookie->getDomain()
+            );
+        }
+
+        return $cacheableResponse;
     }
 
     public static function getSubscribedEvents(): array

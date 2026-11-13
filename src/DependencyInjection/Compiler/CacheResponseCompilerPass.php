@@ -35,8 +35,8 @@ class CacheResponseCompilerPass implements CompilerPassInterface
     {
         $enable = $config['enable'];
 
-        $definition = $container->getDefinition(KernelControllerListener::class);
-        $definition->setArgument('$enable', $enable);
+        $container->getDefinition(KernelControllerListener::class)->setArgument('$enable', $enable);
+        $container->getDefinition(KernelResponseListener::class)->setArgument('$enable', $enable);
     }
 
     private function injectCacheService(ContainerBuilder $container, array $config): void

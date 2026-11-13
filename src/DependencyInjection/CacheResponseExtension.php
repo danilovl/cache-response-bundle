@@ -24,12 +24,12 @@ class CacheResponseExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $kernelControllerPriority = $config['kernel_controller_priority'];
-        if (!empty($kernelControllerPriority)) {
+        if ($kernelControllerPriority !== null) {
             KernelControllerListener::$priority = $kernelControllerPriority;
         }
 
         $kernelResponsePriority = $config['kernel_response_priority'];
-        if (!empty($kernelResponsePriority)) {
+        if ($kernelResponsePriority !== null) {
             KernelResponseListener::$priority = $kernelResponsePriority;
         }
     }

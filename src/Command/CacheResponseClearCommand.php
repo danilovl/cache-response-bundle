@@ -33,20 +33,20 @@ class CacheResponseClearCommand extends Command
 
     protected function configure(): void
     {
-        $this->addOption('all', null, InputOption::VALUE_OPTIONAL, 'Delete all cache items.')
+        $this->addOption('all', null, InputOption::VALUE_NONE, 'Delete all cache items.')
             ->addOption('cacheKey', null, InputOption::VALUE_OPTIONAL, 'Delete only by cache key.')
             ->addOption('similarCacheKey', null, InputOption::VALUE_OPTIONAL, 'Delete all similar cache key.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $all = $input->getOption('all');
+        $all = (bool) $input->getOption('all');
         /** @var string|null $deleteCacheKey */
         $deleteCacheKey = $input->getOption('cacheKey');
         /** @var string|null $deleteSimilarCacheKey */
         $deleteSimilarCacheKey = $input->getOption('similarCacheKey');
 
-        if ($all === null && $deleteCacheKey === null && $deleteSimilarCacheKey === null) {
+        if (!$all && $deleteCacheKey === null && $deleteSimilarCacheKey === null) {
             $this->io->error('You must specify at least one option: all, cacheKey, similarCacheKey.');
 
             return Command::FAILURE;
@@ -103,8 +103,9 @@ class CacheResponseClearCommand extends Command
             $attributeCacheKeysItem = $this->cacheItemPool->getItem(CacheService::CACHE_KEY_FOR_ATTRIBUTE_CACHE_KEYS);
 
             /** @var array $cacheKeysItem */
-            $cacheKeysItem = $attributeCacheKeysItem->get();
+            $cacheKeysItem = $attributeCacheKeysItem->get() ?? [];
             $newCacheKeys = array_diff($cacheKeysItem, $deleteCacheKeys);
+            $newCacheKeys = array_values($newCacheKeys);
 
             $attributeCacheKeysItem->set($newCacheKeys);
             $this->cacheItemPool->save($attributeCacheKeysItem);
