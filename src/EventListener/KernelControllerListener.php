@@ -32,12 +32,15 @@ class KernelControllerListener implements EventSubscriberInterface
             return;
         }
 
-        if (!is_array($controllers = $event->getController())) {
+        $controllers = $event->getController();
+        if (!is_array($controllers)) {
             return;
         }
 
-        /** @var array{object, string} $controllers */
         [$controller, $method] = $controllers;
+        if (!is_object($controller)) {
+            return;
+        }
 
         $this->resolve($controller, $method, $event);
     }
